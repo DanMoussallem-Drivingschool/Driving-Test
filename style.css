@@ -1,8 +1,11 @@
+/* Google Font (custom font for school title) */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap");
+
 :root{
   --text:#eef2ff;
   --muted:#b8c0ff;
   --accent:#4f8cff;
-  --border:rgba(255,255,255,.12);
+  --border:rgba(255,255,255,.14);
 }
 
 *{ box-sizing:border-box; }
@@ -15,7 +18,7 @@ body{
 
   /* FULL SCREEN BACKGROUND IMAGE */
   background:
-    linear-gradient(rgba(8,12,25,0.75), rgba(8,12,25,0.75)),
+    linear-gradient(rgba(8,12,25,0.76), rgba(8,12,25,0.76)),
     url("assets/driving-bg.png");
 
   background-size: cover;
@@ -28,7 +31,7 @@ body{
 }
 
 .container{
-  max-width: 1050px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -40,47 +43,80 @@ body{
   backdrop-filter: blur(10px);
 }
 
-.brand-row{
+.header-inner{
   display:flex;
-  align-items:flex-start;
+  align-items:center;          /* vertical center */
   justify-content:space-between;
-  gap:14px;
+  gap:16px;
   flex-wrap:wrap;
 }
 
+/* Brand */
 .brand{
   display:flex;
   gap:14px;
-  align-items:center;
+  align-items:center;          /* vertical center */
+  min-width: 260px;
 }
 
 .logo-img{
-  width:60px;
-  height:60px;
+  width:64px;
+  height:64px;
   object-fit:contain;
-  border-radius:14px;
+  border-radius:12px;
   background: rgba(255,255,255,0.08);
-  padding:8px;
-  border:1px solid rgba(255,255,255,0.16);
+  padding:6px;
+  border:1px solid rgba(255,255,255,0.15);
+  flex-shrink:0;
+
+  /* subtle animation */
+  animation: floaty 4.5s ease-in-out infinite;
 }
 
-.brand-text h1{
+@keyframes floaty{
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-4px); }
+}
+
+.brand-text{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+/* Custom font for title */
+.school-title{
   margin:0;
-  font-size:24px;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size:22px;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:0.5px;
 }
 
-.sub{
-  margin:6px 0 0;
+.school-title span{
+  display:inline-block;
+  margin-top:4px;
+  font-size:16px;
+  font-weight:700;
   color:var(--muted);
 }
 
-/* CONTACT BUTTONS */
+/* Divider line */
+.divider{
+  width:1px;
+  height:44px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 99px;
+}
+
+/* Contact Buttons */
 .contact{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
+  align-items:center;          /* vertical center */
   justify-content:flex-start;
-  margin-top: 6px;
 }
 
 .pill{
@@ -93,41 +129,64 @@ body{
   color:var(--text);
   text-decoration:none;
   background: rgba(255,255,255,.08);
-  transition: transform .1s ease, border-color .2s ease;
+  transition: transform .12s ease, border-color .2s ease, background .2s ease;
 }
 
 .pill:hover{
   transform: translateY(-1px);
   border-color: rgba(79,140,255,.8);
+  background: rgba(255,255,255,.10);
 }
 
 .pill-primary{
   background: rgba(79,140,255,.22);
   border-color: rgba(79,140,255,.45);
-  font-weight:700;
+  font-weight:800;
 }
 
-/* MAIN CARD */
-main{
-  min-height: 70vh;
+/* Responsive: make divider horizontal on small screens */
+@media (max-width: 740px){
+  .divider{
+    width:100%;
+    height:1px;
+  }
+  .header-inner{
+    align-items:flex-start;
+  }
 }
 
+/* MAIN */
+.main{
+  min-height:70vh;
+  display:flex;
+  align-items:center;          /* center section vertically in page */
+}
+
+/* Card */
 .card{
+  width:100%;
   margin-top:24px;
   padding:24px;
   border-radius:20px;
-  border:1px solid var(--border);
+  border:1px solid rgba(255,255,255,0.14);
   background: rgba(10,15,30,0.78);
   backdrop-filter: blur(10px);
   box-shadow: 0 25px 70px rgba(0,0,0,.45);
 }
 
-h2{
-  margin:0 0 16px;
+.card-title{
+  margin:0 0 8px;
   font-size:18px;
+  font-weight:800;
 }
 
-/* TEST BUTTONS */
+.card-sub{
+  margin:0 0 16px;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+/* Buttons */
 .grid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -144,16 +203,16 @@ h2{
   border-radius:16px;
   text-decoration:none;
   color:var(--text);
-  border:1px solid var(--border);
+  border:1px solid rgba(255,255,255,0.14);
   background: linear-gradient(180deg, rgba(79,140,255,.30), rgba(255,255,255,.06));
-  transition: transform .1s ease, border-color .2s ease;
+  transition: transform .12s ease, border-color .2s ease;
   text-align:center;
-  font-weight:700;
+  font-weight:800;
 }
 
 .btn:hover{
   transform: translateY(-2px);
-  border-color: rgba(79,140,255,.85);
+  border-color: rgba(79,140,255,.90);
 }
 
 .hint{
