@@ -1,10 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DRIVING SCHOOL — Drive with DANY</title>
-  <meta name="description" content="Practice driving theory tests easily." />
+  <title>مدرسة القيادة — Drive with DANY</title>
+  <meta name="description" content="تدرّب على أسئلة الامتحان النظري بسهولة" />
+
+  <!-- Custom font (supports Arabic well) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -14,12 +20,16 @@
     <div class="container header-inner">
       <!-- Brand -->
       <div class="brand">
-        <img src="assets/logo.png" class="logo-img" alt="Driving School Logo" />
+        <img src="assets/logo.png" class="logo-img" alt="شعار المدرسة" />
+
         <div class="brand-text">
-          <h1 class="school-title">
+          <!-- Arabic UI but school name exactly as you asked -->
+          <h1 class="school-title" data-i18n="school_name">
             DRIVING SCHOOL<br>
             <span>Drive with DANY</span>
           </h1>
+
+          <p class="sub" data-i18n="tagline">تدرّب على أسئلة الامتحان النظري بسهولة</p>
         </div>
       </div>
 
@@ -27,17 +37,17 @@
       <div class="divider" aria-hidden="true"></div>
 
       <!-- Contacts -->
-      <nav class="contact" aria-label="Contacts">
+      <nav class="contact" aria-label="معلومات التواصل">
         <a class="pill" href="https://maps.app.goo.gl/NzNJXF6Q3nV3zmGy6" target="_blank" rel="noopener">
-          📍 Branch 1 — Map
+          📍 <span data-i18n="branch1">الفرع الأوّل — العنوان على الخريطة</span>
         </a>
 
         <a class="pill" href="https://maps.app.goo.gl/Pv3fX42JZjJLK5fw6?g_st=awb" target="_blank" rel="noopener">
-          📍 Branch 2 — Map
+          📍 <span data-i18n="branch2">الفرع الثاني — العنوان على الخريطة</span>
         </a>
 
         <a class="pill pill-primary" href="tel:+9613850939">
-          📞 03 850 939
+          📞 <span dir="ltr">03 850 939</span>
         </a>
       </nav>
     </div>
@@ -46,17 +56,19 @@
   <!-- MAIN -->
   <main class="container main">
     <section class="card">
-      <h2 class="card-title">Choose your test type</h2>
-      <p class="card-sub">Start practicing now. Your tests open in dedicated pages.</p>
+      <h2 class="card-title" data-i18n="choose_test">اختر نوع الاختبار</h2>
+      <p class="card-sub" data-i18n="desc">
+        ابدأ التدريب الآن. ستفتح الاختبارات في صفحات مخصّصة.
+      </p>
 
       <div class="grid">
-        <a class="btn" href="tests/moto.html">Motorcycle Test</a>
-        <a class="btn" href="tests/private.html">Private Car Test</a>
-        <a class="btn" href="tests/public.html">Public Car Test</a>
+        <a class="btn" href="tests/moto.html" data-i18n="moto">اختبار الدراجات النارية</a>
+        <a class="btn" href="tests/private.html" data-i18n="private">اختبار السيارات خصوصي</a>
+        <a class="btn" href="tests/public.html" data-i18n="public">اختبار السيارات عمومي</a>
       </div>
 
-      <p class="hint">
-        Tip: you can change the texts easily in <b>app.js</b>.
+      <p class="hint" data-i18n="hint">
+        ملاحظة: يمكنك تعديل النصوص لاحقًا من ملف <b>app.js</b> عند إضافة اللغة الإنجليزية.
       </p>
     </section>
   </main>
@@ -64,7 +76,7 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container footer-inner">
-      <small>© <span id="year"></span> — All rights reserved</small>
+      <small>© <span id="year"></span> — <span data-i18n="rights">جميع الحقوق محفوظة</span></small>
     </div>
   </footer>
 
