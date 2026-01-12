@@ -1,6 +1,3 @@
-/* Google Font (custom font for school title) */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap");
-
 :root{
   --text:#eef2ff;
   --muted:#b8c0ff;
@@ -14,9 +11,9 @@ html, body{ height:100%; }
 
 body{
   margin:0;
-  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: "Cairo", system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
 
-  /* FULL SCREEN BACKGROUND IMAGE */
+  /* FULL SCREEN BACKGROUND */
   background:
     linear-gradient(rgba(8,12,25,0.76), rgba(8,12,25,0.76)),
     url("assets/driving-bg.png");
@@ -45,7 +42,7 @@ body{
 
 .header-inner{
   display:flex;
-  align-items:center;          /* vertical center */
+  align-items:center;                 /* center vertically */
   justify-content:space-between;
   gap:16px;
   flex-wrap:wrap;
@@ -55,7 +52,7 @@ body{
 .brand{
   display:flex;
   gap:14px;
-  align-items:center;          /* vertical center */
+  align-items:center;                 /* center vertically */
   min-width: 260px;
 }
 
@@ -84,14 +81,13 @@ body{
   justify-content:center;
 }
 
-/* Custom font for title */
+/* School title */
 .school-title{
   margin:0;
-  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
   font-size:22px;
-  line-height:1.1;
+  line-height:1.15;
   font-weight:800;
-  letter-spacing:0.5px;
+  letter-spacing:0.2px;
 }
 
 .school-title span{
@@ -102,6 +98,12 @@ body{
   color:var(--muted);
 }
 
+.sub{
+  margin:8px 0 0;
+  color:var(--muted);
+  line-height:1.5;
+}
+
 /* Divider line */
 .divider{
   width:1px;
@@ -110,12 +112,12 @@ body{
   border-radius: 99px;
 }
 
-/* Contact Buttons */
+/* Contact buttons */
 .contact{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
-  align-items:center;          /* vertical center */
+  align-items:center;                 /* center vertically */
   justify-content:flex-start;
 }
 
@@ -130,6 +132,7 @@ body{
   text-decoration:none;
   background: rgba(255,255,255,.08);
   transition: transform .12s ease, border-color .2s ease, background .2s ease;
+  white-space:nowrap;
 }
 
 .pill:hover{
@@ -144,7 +147,7 @@ body{
   font-weight:800;
 }
 
-/* Responsive: make divider horizontal on small screens */
+/* Responsive: divider becomes horizontal */
 @media (max-width: 740px){
   .divider{
     width:100%;
@@ -153,16 +156,18 @@ body{
   .header-inner{
     align-items:flex-start;
   }
+  .pill{
+    white-space:normal;
+  }
 }
 
 /* MAIN */
 .main{
   min-height:70vh;
   display:flex;
-  align-items:center;          /* center section vertically in page */
+  align-items:center;                 /* center card vertically */
 }
 
-/* Card */
 .card{
   width:100%;
   margin-top:24px;
@@ -183,7 +188,7 @@ body{
 .card-sub{
   margin:0 0 16px;
   color:var(--muted);
-  line-height:1.6;
+  line-height:1.8;
 }
 
 /* Buttons */
@@ -218,7 +223,7 @@ body{
 .hint{
   color:var(--muted);
   margin-top:16px;
-  line-height:1.7;
+  line-height:1.9;
 }
 
 /* FOOTER */
