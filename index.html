@@ -6,16 +6,16 @@
   <title>مدرسة القيادة — Drive with DANY</title>
   <meta name="description" content="تدرّب على أسئلة الامتحان النظري بسهولة" />
 
-  <!-- Custom font (supports Arabic well) -->
+  <!-- Arabic-friendly font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css" />
+  <!-- Cache-busting -->
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 
 <body>
-  <!-- HEADER -->
   <header class="header">
     <div class="container header-inner">
       <!-- Brand -->
@@ -23,13 +23,11 @@
         <img src="assets/logo.png" class="logo-img" alt="شعار المدرسة" />
 
         <div class="brand-text">
-          <!-- Arabic UI but school name exactly as you asked -->
-          <h1 class="school-title" data-i18n="school_name">
+          <h1 class="school-title">
             DRIVING SCHOOL<br>
             <span>Drive with DANY</span>
           </h1>
-
-          <p class="sub" data-i18n="tagline">تدرّب على أسئلة الامتحان النظري بسهولة</p>
+          <p class="sub">تدرّب على أسئلة الامتحان النظري بسهولة</p>
         </div>
       </div>
 
@@ -39,11 +37,11 @@
       <!-- Contacts -->
       <nav class="contact" aria-label="معلومات التواصل">
         <a class="pill" href="https://maps.app.goo.gl/NzNJXF6Q3nV3zmGy6" target="_blank" rel="noopener">
-          📍 <span data-i18n="branch1">الفرع الأوّل — العنوان على الخريطة</span>
+          📍 الفرع الأوّل — العنوان على الخريطة
         </a>
 
         <a class="pill" href="https://maps.app.goo.gl/Pv3fX42JZjJLK5fw6?g_st=awb" target="_blank" rel="noopener">
-          📍 <span data-i18n="branch2">الفرع الثاني — العنوان على الخريطة</span>
+          📍 الفرع الثاني — العنوان على الخريطة
         </a>
 
         <a class="pill pill-primary" href="tel:+9613850939">
@@ -53,33 +51,14 @@
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="container main">
     <section class="card">
-      <h2 class="card-title" data-i18n="choose_test">اختر نوع الاختبار</h2>
-      <p class="card-sub" data-i18n="desc">
+      <h2 class="card-title">اختر نوع الاختبار</h2>
+      <p class="card-sub">
         ابدأ التدريب الآن. ستفتح الاختبارات في صفحات مخصّصة.
       </p>
 
       <div class="grid">
-        <a class="btn" href="tests/moto.html" data-i18n="moto">اختبار الدراجات النارية</a>
-        <a class="btn" href="tests/private.html" data-i18n="private">اختبار السيارات خصوصي</a>
-        <a class="btn" href="tests/public.html" data-i18n="public">اختبار السيارات عمومي</a>
-      </div>
-
-      <p class="hint" data-i18n="hint">
-        ملاحظة: يمكنك تعديل النصوص لاحقًا من ملف <b>app.js</b> عند إضافة اللغة الإنجليزية.
-      </p>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container footer-inner">
-      <small>© <span id="year"></span> — <span data-i18n="rights">جميع الحقوق محفوظة</span></small>
-    </div>
-  </footer>
-
-  <script src="app.js"></script>
-</body>
-</html>
+        <a class="btn" href="tests/moto.html">اختبار الدراجات النارية</a>
+        <a class="btn" href="tests/private.html">اختبار السيارات خصوصي</a>
+        <a class="btn" hre
