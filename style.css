@@ -1,200 +1,178 @@
 :root{
+  --bg:#0b1220;
+  --card:#111b33;
   --text:#eef2ff;
   --muted:#b8c0ff;
   --accent:#4f8cff;
-  --border:rgba(255,255,255,.14);
+  --accent2:#22c55e;
+  --border:rgba(255,255,255,.10);
 }
 
 *{box-sizing:border-box}
 
-html,body{height:100%}
-
 body{
   margin:0;
-  font-family:"Cairo",system-ui,Tahoma,Arial;
-
-  background:
-    linear-gradient(rgba(8,12,25,.76),rgba(8,12,25,.76)),
-    url("assets/driving-bg.png");
-
-  background-size:cover;
-  background-position:center;
-  background-attachment:fixed;
-
+  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+  background: var(--bg);
   color:var(--text);
 }
 
 .container{
   max-width:1100px;
-  margin:auto;
+  margin:0 auto;
   padding:20px;
 }
 
-/* HEADER */
-.header{
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);
-}
+/* ============================= */
+/* HERO / HEADER SECTION */
+/* ============================= */
 
-.header-inner{
+.hero{
+  position:relative;
+  min-height:75vh;
   display:flex;
-  flex-direction:column;
   align-items:center;
-  gap:18px;
-}
-
-/* BRAND */
-.brand-center{
+  justify-content:center;
   text-align:center;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  background:url("assets/driving-bg.png") center/cover no-repeat;
+  overflow:hidden;
 }
 
-/* ✅ FORCE: Remove ANY box/padding/border around logo */
-.logo-img{
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-
-  display:block;
-  object-fit:contain;
-
-  animation:floaty 4.5s ease-in-out infinite;
+/* DARK OVERLAY (now transparent) */
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.30);   /* ← transparency level */
+  z-index:1;
 }
 
-/* ✅ FORCE: Make logo BIG */
-.logo-big{
-  width: 360px !important;
-  height: auto !important;
-  max-height: 360px !important;
+/* CONTENT ABOVE OVERLAY */
+.hero-content{
+  position:relative;
+  z-index:2;
+  max-width:700px;
+  padding:20px;
+  text-shadow:0 2px 10px rgba(0,0,0,0.7);
 }
 
-@keyframes floaty{
-  0%,100%{transform:translateY(0)}
+/* LOGO */
+.hero-logo img{
+  width:260px;
+  max-width:90%;
+  height:auto;
+  margin-bottom:18px;
+  animation:float 3.5s ease-in-out infinite;
+}
+
+/* LOGO ANIMATION */
+@keyframes float{
+  0%{transform:translateY(0)}
   50%{transform:translateY(-8px)}
+  100%{transform:translateY(0)}
 }
 
 /* SCHOOL NAME */
 .school-title{
-  margin:14px 0 0;
-  font-size:28px;
+  font-size:34px;
   font-weight:800;
-  line-height:1.2;
+  margin:10px 0 5px;
+  letter-spacing:1px;
 }
 
-.school-title span{
-  font-size:19px;
+/* SUB TITLE */
+.school-subtitle{
   color:var(--muted);
+  margin-bottom:18px;
+  font-size:16px;
 }
 
-.sub{
-  margin-top:10px;
-  color:var(--muted);
-}
+/* CONTACT PILLS */
 
-/* CONTACT */
 .contact{
   display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
   gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
 }
 
 .pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
   padding:10px 14px;
   border-radius:999px;
   border:1px solid var(--border);
-  background:rgba(255,255,255,.08);
-  color:var(--text);
+  background:rgba(0,0,0,.35);
+  color:#fff;
   text-decoration:none;
-  transition:.2s;
+  backdrop-filter: blur(6px);
 }
 
-.pill:hover{
-  transform:translateY(-1px);
-  border-color:var(--accent);
-}
-
-.pill-primary{
-  background:rgba(79,140,255,.25);
-  border-color:rgba(79,140,255,.6);
-  font-weight:800;
-}
-
-/* MAIN */
-.main{
-  min-height:70vh;
-  display:flex;
-  align-items:center;
-}
+/* ============================= */
+/* TEST CARD SECTION */
+/* ============================= */
 
 .card{
-  width:100%;
-  background:rgba(10,15,30,.78);
-  backdrop-filter:blur(10px);
-  padding:24px;
+  margin-top:-80px;
+  padding:26px;
   border-radius:20px;
   border:1px solid var(--border);
-  box-shadow:0 25px 70px rgba(0,0,0,.45);
+  background:rgba(10,15,30,.85);
+  backdrop-filter: blur(12px);
+  position:relative;
+  z-index:3;
 }
 
-.card-title{
-  margin:0 0 6px;
+h2{
+  margin:0 0 16px;
   font-size:20px;
-  font-weight:800;
-}
-
-.card-sub{
-  color:var(--muted);
-  margin-bottom:16px;
+  text-align:right;
 }
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:14px;
 }
 
+@media (max-width: 820px){
+  .grid{grid-template-columns:1fr}
+}
+
+/* BUTTONS */
+
 .btn{
-  padding:16px;
+  display:block;
+  padding:16px 14px;
   border-radius:16px;
-  border:1px solid var(--border);
   text-decoration:none;
   color:var(--text);
-  background:linear-gradient(180deg,rgba(79,140,255,.3),rgba(255,255,255,.06));
+  border:1px solid var(--border);
+  background: linear-gradient(180deg, rgba(79,140,255,.22), rgba(255,255,255,.03));
+  transition: transform .08s ease, border-color .2s ease;
   text-align:center;
-  font-weight:800;
 }
 
 .btn:hover{
-  border-color:var(--accent);
-  transform:translateY(-2px);
+  transform: translateY(-2px);
+  border-color: rgba(79,140,255,.6);
 }
 
 .hint{
-  margin-top:16px;
   color:var(--muted);
+  margin-top:14px;
+  line-height:1.6;
 }
 
 /* FOOTER */
+
 .footer{
-  margin-top:40px;
-  padding:20px 0;
-  text-align:center;
-  background:rgba(0,0,0,.45);
+  margin-top:26px;
   border-top:1px solid var(--border);
   color:var(--muted);
-}
-
-/* MOBILE */
-@media(max-width:820px){
-  .grid{grid-template-columns:1fr}
-  .logo-big{
-    width: 220px !important;
-    max-height: 220px !important;
-  }
+  background: rgba(0,0,0,.25);
+  text-align:center;
+  padding:14px;
+  font-size:14px;
 }
