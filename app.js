@@ -1,9 +1,2 @@
-// Easy customization:
-const settings = {
-  schoolName: "مدرسة القيادة الجديدة",
-  tagline: "تدرّب على أسئلة الامتحان النظري بسهولة"
-};
-
-document.getElementById("schoolName").textContent = settings.schoolName;
-document.getElementById("tagline").textContent = settings.tagline;
+// If you want to change titles later, do it here:
 document.getElementById("year").textContent = new Date().getFullYear();
