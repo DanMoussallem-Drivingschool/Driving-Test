@@ -1,56 +1,62 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>مدرسة القيادة الجديدة</title>
-  <meta name="description" content="تدرّب على أسئلة الامتحان النظري بسهولة" />
+  <title>DRIVING SCHOOL — Drive with DANY</title>
+  <meta name="description" content="Practice driving theory tests easily." />
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <!-- HEADER -->
   <header class="header">
-    <div class="container">
-      <div class="brand-row">
-        <div class="brand">
-          <img src="assets/logo.png" class="logo-img" alt="شعار مدرسة القيادة" />
-          <div class="brand-text">
-            <h1 id="schoolName">مدرسة القيادة الجديدة</h1>
-            <p class="sub" id="tagline">تدرّب على أسئلة الامتحان النظري بسهولة</p>
-          </div>
-        </div>
-
-        <div class="contact">
-          <a class="pill" href="https://maps.app.goo.gl/NzNJXF6Q3nV3zmGy6" target="_blank" rel="noopener">
-            📍 الفرع الأول — العنوان على الخريطة
-          </a>
-
-          <a class="pill" href="https://maps.app.goo.gl/Pv3fX42JZjJLK5fw6?g_st=awb" target="_blank" rel="noopener">
-            📍 الفرع الثاني — العنوان على الخريطة
-          </a>
-
-          <a class="pill pill-primary" href="tel:+9613850939">
-            📞 03 850 939
-          </a>
+    <div class="container header-inner">
+      <!-- Brand -->
+      <div class="brand">
+        <img src="assets/logo.png" class="logo-img" alt="Driving School Logo" />
+        <div class="brand-text">
+          <h1 class="school-title">
+            DRIVING SCHOOL<br>
+            <span>Drive with DANY</span>
+          </h1>
         </div>
       </div>
+
+      <!-- Divider -->
+      <div class="divider" aria-hidden="true"></div>
+
+      <!-- Contacts -->
+      <nav class="contact" aria-label="Contacts">
+        <a class="pill" href="https://maps.app.goo.gl/NzNJXF6Q3nV3zmGy6" target="_blank" rel="noopener">
+          📍 Branch 1 — Map
+        </a>
+
+        <a class="pill" href="https://maps.app.goo.gl/Pv3fX42JZjJLK5fw6?g_st=awb" target="_blank" rel="noopener">
+          📍 Branch 2 — Map
+        </a>
+
+        <a class="pill pill-primary" href="tel:+9613850939">
+          📞 03 850 939
+        </a>
+      </nav>
     </div>
   </header>
 
   <!-- MAIN -->
-  <main class="container">
+  <main class="container main">
     <section class="card">
-      <h2>اختر نوع الاختبار</h2>
+      <h2 class="card-title">Choose your test type</h2>
+      <p class="card-sub">Start practicing now. Your tests open in dedicated pages.</p>
 
       <div class="grid">
-        <a class="btn" href="tests/moto.html">اختبار الدراجات النارية</a>
-        <a class="btn" href="tests/private.html">اختبار السيارات خصوصي</a>
-        <a class="btn" href="tests/public.html">اختبار السيارات عمومي</a>
+        <a class="btn" href="tests/moto.html">Motorcycle Test</a>
+        <a class="btn" href="tests/private.html">Private Car Test</a>
+        <a class="btn" href="tests/public.html">Public Car Test</a>
       </div>
 
       <p class="hint">
-        ملاحظة: يمكنك تعديل اسم المدرسة من ملف <b>app.js</b> إذا أردت.
+        Tip: you can change the texts easily in <b>app.js</b>.
       </p>
     </section>
   </main>
@@ -58,7 +64,7 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container footer-inner">
-      <small>© <span id="year"></span> — جميع الحقوق محفوظة</small>
+      <small>© <span id="year"></span> — All rights reserved</small>
     </div>
   </footer>
 
