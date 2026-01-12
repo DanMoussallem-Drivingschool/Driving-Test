@@ -2,6 +2,7 @@
 document.getElementById("year").textContent = new Date().getFullYear();
 
 
+
 /*
 Later (optional): bilingual support.
 Example idea:
