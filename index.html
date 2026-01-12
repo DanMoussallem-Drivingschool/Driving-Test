@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <title>مدرسة القيادة — Drive with DANY</title>
+  <title>مدرسة القيادة – Drive with DANY</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Arabic font -->
@@ -10,15 +10,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
 
-  <!-- cache busting -->
-  <link rel="stylesheet" href="style.css?v=10">
+  <!-- Main style -->
+  <link rel="stylesheet" href="style.css?v=3000">
 </head>
 <body>
 
 <header class="header">
   <div class="container header-inner">
 
-    <!-- BIG CENTERED LOGO -->
     <div class="brand brand-center">
       <img src="assets/logo.png" class="logo-img logo-big" alt="شعار المدرسة">
 
@@ -27,18 +26,17 @@
           DRIVING SCHOOL<br>
           <span>Drive with DANY</span>
         </h1>
-        <p class="sub">تدرّب على أسئلة الامتحان النظري بسهولة</p>
+        <p class="sub">مدرسة تعليم قيادة – تدريب وامتحانات نظرية</p>
       </div>
     </div>
 
-    <!-- CONTACT -->
     <nav class="contact">
-      <a class="pill" href="https://maps.app.goo.gl/NBw9fCaRHcSoxkch8" target="_blank">
-        📍 الفرع الأوّل — العنوان على الخريطة
+      <a class="pill" href="https://maps.app.goo.gl/NzNJXF6Q3nV3zmGy6" target="_blank">
+        📍 الفرع الأول
       </a>
 
       <a class="pill" href="https://maps.app.goo.gl/Pv3fX42JZjJLK5fw6?g_st=awb" target="_blank">
-        📍 الفرع الثاني — العنوان على الخريطة
+        📍 الفرع الثاني
       </a>
 
       <a class="pill pill-primary" href="tel:+9613850939">
@@ -50,28 +48,47 @@
 </header>
 
 <main class="container main">
+
   <section class="card">
-    <h2 class="card-title">اختر نوع الاختبار</h2>
-    <p class="card-sub">ابدأ التدريب الآن. ستفتح الاختبارات في صفحات مخصّصة.</p>
+
+    <h2>الاختبارات النظرية</h2>
+    <p class="card-sub">اختر نوع الرخصة وابدأ التدريب الآن</p>
 
     <div class="grid">
-      <a class="btn" href="tests/moto.html">اختبار الدراجات النارية</a>
-      <a class="btn" href="tests/private.html">اختبار السيارات خصوصي</a>
-      <a class="btn" href="tests/public.html">اختبار السيارات عمومي</a>
+
+      <!-- Public car quiz -->
+      <a class="btn" href="tests/car_quiz.html">
+        🚕 اختبار سيارة عمومية
+      </a>
+
+      <!-- Placeholders for future -->
+      <a class="btn" href="#" onclick="alert('قريباً')">
+        🚗 اختبار سيارة خصوصي (قريباً)
+      </a>
+
+      <a class="btn" href="#" onclick="alert('قريباً')">
+        🏍 اختبار دراجات نارية (قريباً)
+      </a>
+
     </div>
 
     <p class="hint">
-      ملاحظة: لاحقًا يمكن إضافة اللغة الإنجليزية بسهولة بدون تغيير التصميم.
+      جميع الاختبارات مطابقة لنمط الامتحان الرسمي وتعمل مباشرة عبر المتصفح.
     </p>
+
   </section>
+
 </main>
 
 <footer class="footer">
-  <div class="container footer-inner">
-    <small>© <span id="year"></span> — جميع الحقوق محفوظة</small>
+  <div class="container">
+    <small>© <span id="year"></span> – جميع الحقوق محفوظة | Drive with DANY</small>
   </div>
 </footer>
 
-<script src="app.js?v=10"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
 </body>
 </html>
