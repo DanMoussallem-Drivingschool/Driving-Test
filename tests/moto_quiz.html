@@ -5,74 +5,88 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>اختبار الدراجات النارية</title>
 
-  <!-- ✅ ملف الستايل الأساسي (موجود بجانب index.html) -->
-  <link rel="stylesheet" href="../style.css?v=12" />
-
-  <!-- ✅ ستايل خاص للدراجات (داخل tests) -->
-  <link rel="stylesheet" href="./moto_quiz.css?v=12" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+  <!-- نفس ستايل السيارة (إذا عندك ملف CSS خاص للموتو حطه بدل هذا) -->
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* لون مختلف للموتو (بنفس الستايل) */
+    :root{ --accent:#a855f7; } /* بنفسجي */
+    .pill-primary{ background:rgba(168,85,247,.22)!important; border-color:rgba(168,85,247,.6)!important; }
+    .btn:hover{ border-color:rgba(168,85,247,.85)!important; }
+    .quiz-option.selected{ outline:2px solid rgba(168,85,247,.65); }
+    .quiz-option.correct{ outline:2px solid rgba(34,197,94,.75); }
+    .quiz-option.wrong{ outline:2px solid rgba(239,68,68,.75); }
+    .quiz-option{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px; border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      cursor:pointer;
+      margin-top:12px;
+    }
+    .quiz-radio{
+      width:16px;height:16px;border-radius:999px;border:2px solid rgba(255,255,255,.45);
+      flex:0 0 auto; margin-inline-start:14px;
+    }
+    .quiz-option.selected .quiz-radio{ border-color: rgba(168,85,247,.9); }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .actions button{
+      padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06); color:#eef2ff; font-weight:800; cursor:pointer;
+    }
+    .actions button:disabled{ opacity:.45; cursor:not-allowed; }
+    #finishArea{ display:none; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    #statusText{ margin-top:10px; color: #b8c0ff; font-weight:700; }
+    .meta-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#b8c0ff; font-weight:700; }
+    .progress{ height:8px; border-radius:999px; background:rgba(255,255,255,.12); overflow:hidden; }
+    .progress > div{ height:100%; width:0%; background:rgba(168,85,247,.8); transition:width .25s ease; }
+    .question{ font-size:20px; font-weight:900; margin:12px 0 6px; }
+  </style>
 </head>
 
-<body class="quiz-page quiz-moto">
-
-  <div class="container">
-
-    <header class="header quiz-header">
-      <div class="header-inner">
-        <div class="brand-center">
-          <h1 class="quiz-title">اختبار الدراجات النارية</h1>
-          <p class="quiz-subtitle">اختر إجابة واحدة → أكد الإجابة → انتقل للسؤال التالي</p>
-        </div>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="brand-center">
+        <h1 style="margin:0;font-size:34px;font-weight:900;">اختبار الدراجات النارية</h1>
+        <div class="sub">اختر إجابة واحدة → أكّد الإجابة → انتقل للسؤال التالي</div>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <main class="main">
-      <section class="card quiz-card">
+  <main class="main">
+    <div class="container">
+      <section class="card">
 
-        <div class="quiz-topbar">
-          <div class="quiz-meta" id="metaRight">السؤال 1 من 30</div>
-          <div class="quiz-meta" id="metaLeft">النتيجة: 0</div>
+        <div class="meta-row">
+          <div id="metaLeft">النتيجة: 0</div>
+          <div id="metaRight">السؤال 1 من 27</div>
         </div>
 
-        <div class="quiz-progress-wrap">
-          <div class="quiz-progress-bar" id="progressBar"></div>
+        <div class="progress"><div id="progressBar"></div></div>
+
+        <div class="question" id="questionText"></div>
+        <div id="choices"></div>
+
+        <div class="actions">
+          <button id="confirmBtn" disabled>تأكيد الإجابة</button>
+          <button id="nextBtn" disabled>السؤال التالي</button>
         </div>
 
-        <h2 class="quiz-question" id="questionText"></h2>
+        <div id="statusText"></div>
 
-        <div class="quiz-options" id="choices"></div>
-
-        <div class="quiz-controls">
-          <button class="pill" id="nextBtn" disabled>السؤال التالي</button>
-          <button class="pill pill-primary" id="confirmBtn" disabled>تأكيد الإجابة</button>
+        <div id="finishArea" class="actions">
+          <button id="restartBtn">إعادة الاختبار</button>
+          <button id="savePdfBtn">تحميل النتيجة PDF</button>
         </div>
 
-        <div class="quiz-bottom">
-          <div class="quiz-status" id="statusText"></div>
-
-          <div class="quiz-finish" id="finishArea" style="display:none">
-            <button class="pill" id="restartBtn">إعادة الاختبار</button>
-            <button class="pill pill-primary" id="savePdfBtn">تحميل النتيجة PDF</button>
-          </div>
-
-          <p class="hint" id="lastSaved" style="margin-top:12px"></p>
-        </div>
+        <div class="hint" id="lastSaved"></div>
 
       </section>
-    </main>
+    </div>
+  </main>
 
-    <footer class="footer">
-      © جميع الحقوق محفوظة
-    </footer>
-
-  </div>
-
-  <!-- ✅ ملفات JS داخل tests -->
-<script src="./moto_questions.js?v=12"></script>
-<script src="./moto_quiz.js?v=12"></script>
-
+  <!-- مهم جداً: ترتيب التحميل -->
+  <script src="./moto_questions.js?v=27"></script>
+  <script src="./moto_quiz.js?v=27"></script>
 </body>
 </html>
