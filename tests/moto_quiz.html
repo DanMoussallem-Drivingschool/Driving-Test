@@ -3,72 +3,95 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title> اختبار الدراجات النارية
-</title>
+  <title>اختبار الدراجات النارية</title>
 
-  <link rel="stylesheet" href="../style.css?v=2001" />
-  <link rel="stylesheet" href="quiz_form.css?v=2001" />
+  <!-- نفس ستايل الموقع الأساسي -->
+  <link rel="stylesheet" href="../style.css" />
+
+  <!-- تخصيص ألوان الدراجات (بنفسجي) -->
+  <style>
+    :root{
+      --motoAccent: #a855f7;   /* بنفسجي */
+      --motoAccent2:#22c55e;   /* أخضر للصح */
+      --motoWrong:  #ef4444;   /* أحمر للخطأ */
+    }
+    .moto-theme .btn{
+      background: linear-gradient(180deg, rgba(168,85,247,.32), rgba(255,255,255,.06));
+    }
+    .moto-theme .btn:hover{ border-color: rgba(168,85,247,.75); }
+    .moto-theme .pill-primary{
+      background: rgba(168,85,247,.22);
+      border-color: rgba(168,85,247,.55);
+    }
+  </style>
 </head>
 
-<body>
-<header class="header">
-  <div class="container header-inner">
-    <div class="brand brand-center">
-      <img src="../assets/logo.png" class="logo-img logo-big" alt="شعار المدرسة">
-      <div class="brand-text">
-        <h1 class="school-title">اختبار قيادة سيارة عمومية</h1>
-        <p class="sub">اختر إجابة واحدة → أكد الإجابة → انتقل للسؤال التالي</p>
-      </div>
-    </div>
-  </div>
-</header>
+<body class="moto-theme">
 
-<main class="container main">
-  <section class="card quiz-shell" id="captureArea">
-    <div class="topbar">
-      <div id="progress" class="progress">السؤال 1 من 30</div>
-      <div id="miniScore" class="score">النتيجة: 0</div>
-    </div>
+  <header class="header">
+    <div class="container header-inner">
 
-    <div class="bar-wrap" aria-hidden="true">
-      <div class="bar" id="bar"></div>
-    </div>
+      <div class="brand-center">
+        <!-- إذا عندك لوجو خاص بالموقع خليّه هنا -->
+        <img class="logo-img logo-big" src="../assets/logo.png" alt="Logo" />
 
-    <form id="quizForm" class="quiz-form" autocomplete="off">
-      <h2 id="question" class="question">...</h2>
-
-      <fieldset id="choices" class="choices" aria-label="الخيارات"></fieldset>
-
-      <div class="actions">
-        <button type="button" id="confirmBtn" class="btn2" disabled>تأكيد الإجابة</button>
-        <button type="button" id="nextBtn" class="btn2 ghost" disabled>السؤال التالي</button>
+        <h1 class="school-title">اختبار الدراجات النارية</h1>
+        <div class="sub">اختر إجابة واحدة → أكد الإجابة → انتقل للسؤال التالي</div>
       </div>
 
-      <p id="msg" class="msg">اختر إجابة للمتابعة.</p>
+      <!-- (اختياري) روابط سريعة -->
+      <nav class="contact">
+        <a class="pill" href="../index.html">🏠 العودة للصفحة الرئيسية</a>
+      </nav>
 
-      <div class="bottom-actions">
-        <button type="button" id="pdfBtn" class="btn2 small">تحميل النتيجة PDF</button>
-        <button type="button" id="restartBtn" class="btn2 small ghost">إعادة الاختبار</button>
-      </div>
+    </div>
+  </header>
 
-      <div class="last-result" id="lastResult"></div>
-    </form>
-  </section>
-</main>
+  <main class="main">
+    <div class="container">
 
-<!-- PDF libs (local files) -->
-<script src="../libs/html2canvas.min.js"></script>
-<script src="../libs/jspdf.umd.min.js"></script>
+      <section class="card" style="max-width:980px;margin:0 auto;">
 
-<script src="moto_questions.js"></script>
-<script src="moto_quiz.js"></script>
+        <!-- Meta / Progress -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div id="metaLeft" style="color:var(--muted);font-weight:800;">النتيجة: 0</div>
+          <div id="metaRight" style="color:var(--muted);font-weight:800;">السؤال 1 من 27</div>
+        </div>
 
-<script>
-  window.startQuizForm({
-    jsonPath: "../data/public_q1_30.json",
-    totalLimit: 30,
-    quizId: "public-30"
-  });
-</script>
+        <div style="height:8px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;margin:12px 0 18px;">
+          <div id="progressBar" style="height:100%;width:0%;background:rgba(168,85,247,.7);"></div>
+        </div>
+
+        <!-- Question -->
+        <h2 id="questionText" class="card-title" style="font-size:22px;margin-top:6px;"></h2>
+
+        <!-- Choices -->
+        <div id="choices" class="grid" style="grid-template-columns:1fr; gap:12px; margin-top:14px;"></div>
+
+        <!-- Hint -->
+        <div id="resultHint" class="hint" style="display:none;"></div>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start;margin-top:16px;">
+          <button id="confirmBtn" class="pill pill-primary" type="button">تأكيد الإجابة</button>
+          <button id="nextBtn" class="pill" type="button" disabled>السؤال التالي</button>
+          <button id="restartBtn" class="pill" type="button" style="display:none;">إعادة الاختبار</button>
+          <button id="savePdfBtn" class="pill" type="button" style="display:none;">تحميل النتيجة PDF</button>
+        </div>
+
+        <div id="lastSaved" class="hint" style="margin-top:10px;display:none;"></div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© جميع الحقوق محفوظة</div>
+  </footer>
+
+  <!-- data + logic -->
+  <script src="moto_questions.js"></script>
+  <script src="moto_quiz.js"></script>
 </body>
 </html>
