@@ -1,34 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>اختبار الدراجات النارية</title>
-<link rel="stylesheet" href="../style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبار سيارة عمومية</title>
+
+  <link rel="stylesheet" href="../style.css?v=2001" />
+  <link rel="stylesheet" href="quiz_form.css?v=2001" />
 </head>
+
 <body>
+<header class="header">
+  <div class="container header-inner">
+    <div class="brand brand-center">
+      <img src="../assets/logo.png" class="logo-img logo-big" alt="شعار المدرسة">
+      <div class="brand-text">
+        <h1 class="school-title">اختبار قيادة سيارة عمومية</h1>
+        <p class="sub">اختر إجابة واحدة → أكد الإجابة → انتقل للسؤال التالي</p>
+      </div>
+    </div>
+  </div>
+</header>
 
-<div class="container main">
-  <div class="card">
-    <h2>اختبار الدراجات النارية</h2>
-    <div id="progress"></div>
-    <div id="scoreMini"></div>
-
-    <h3 id="questionText"></h3>
-    <div id="choices"></div>
-
-    <div style="margin-top:15px">
-      <button id="confirmBtn">تأكيد الإجابة</button>
-      <button id="nextBtn">السؤال التالي</button>
-      <button id="restartBtn" style="display:none">إعادة</button>
-      <button id="savePdfBtn" style="display:none">PDF</button>
+<main class="container main">
+  <section class="card quiz-shell" id="captureArea">
+    <div class="topbar">
+      <div id="progress" class="progress">السؤال 1 من 30</div>
+      <div id="miniScore" class="score">النتيجة: 0</div>
     </div>
 
-    <div id="resultHint" style="display:none;margin-top:10px"></div>
-  </div>
-</div>
+    <div class="bar-wrap" aria-hidden="true">
+      <div class="bar" id="bar"></div>
+    </div>
 
-<script src="./moto_questions.js"></script>
-<script src="./moto_quiz.js"></script>
+    <form id="quizForm" class="quiz-form" autocomplete="off">
+      <h2 id="question" class="question">...</h2>
 
+      <fieldset id="choices" class="choices" aria-label="الخيارات"></fieldset>
+
+      <div class="actions">
+        <button type="button" id="confirmBtn" class="btn2" disabled>تأكيد الإجابة</button>
+        <button type="button" id="nextBtn" class="btn2 ghost" disabled>السؤال التالي</button>
+      </div>
+
+      <p id="msg" class="msg">اختر إجابة للمتابعة.</p>
+
+      <div class="bottom-actions">
+        <button type="button" id="pdfBtn" class="btn2 small">تحميل النتيجة PDF</button>
+        <button type="button" id="restartBtn" class="btn2 small ghost">إعادة الاختبار</button>
+      </div>
+
+      <div class="last-result" id="lastResult"></div>
+    </form>
+  </section>
+</main>
+
+<!-- PDF libs (local files) -->
+<script src="../libs/html2canvas.min.js"></script>
+<script src="../libs/jspdf.umd.min.js"></script>
+
+<script src="quiz_form.js?v=2001"></script>
+<script>
+  window.startQuizForm({
+    jsonPath: "../data/public_q1_30.json",
+    totalLimit: 30,
+    quizId: "public-30"
+  });
+</script>
 </body>
 </html>
