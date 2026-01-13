@@ -115,6 +115,11 @@ body{
   text-decoration:none;
   transition:.2s;
 }
+.pill-license{
+  background:rgba(79,140,255,.18);
+  border-color:rgba(79,140,255,.45);
+  font-weight:800;
+}
 
 .pill:hover{
   transform:translateY(-1px);
