@@ -1,1 +1,61 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>اختبار الدراجات النارية</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="container">
+
+    <header class="header">
+      <div class="header-inner">
+        <div class="brand-center">
+          <!-- عدّل اسم اللوجو إذا كان عندك اسم مختلف -->
+          <img class="logo-img logo-big" src="assets/logo.png" alt="Logo">
+          <h1 class="school-title">DRIVING SCHOOL<br><span>Drive with DANY</span></h1>
+          <p class="sub">اختبار الدراجات النارية</p>
+
+          <nav class="contact">
+            <a class="pill" href="index.html">🏠 العودة للصفحة الرئيسية</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="card">
+
+        <h2 class="card-title" id="progress"></h2>
+        <p class="card-sub" id="questionText"></p>
+
+        <div class="grid" id="choices"></div>
+
+        <div class="contact" style="margin-top:16px">
+          <button class="pill pill-primary" id="nextBtn" disabled>التالي</button>
+          <button class="pill" id="restartBtn" style="display:none">إعادة الاختبار</button>
+          <button class="pill" id="savePdfBtn" style="display:none">حفظ النتيجة PDF</button>
+        </div>
+
+        <p class="hint" id="resultHint" style="display:none"></p>
+
+      </section>
+    </main>
+
+    <footer class="footer">
+      © جميع الحقوق محفوظة
+    </footer>
+
+  </div>
+
+  <script src="moto_questions.js"></script>
+  <script src="moto_quiz.js"></script>
+</body>
+</html>
 
