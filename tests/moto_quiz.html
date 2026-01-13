@@ -5,58 +5,61 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>اختبار الدراجات النارية</title>
 
-  <!-- نفس ملف CSS تبع السيارة -->
-  <link rel="stylesheet" href="style.css?v=7" />
+  <!-- ✅ ملف الستايل الأساسي (موجود بجانب index.html) -->
+  <link rel="stylesheet" href="../style.css?v=12" />
+
+  <!-- ✅ ستايل خاص للدراجات (داخل tests) -->
+  <link rel="stylesheet" href="./moto_quiz.css?v=12" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 
-<!-- ✅ class جديدة لتغيير لون الدراجات فقط -->
 <body class="quiz-page quiz-moto">
 
   <div class="container">
 
-    <header class="header">
+    <header class="header quiz-header">
       <div class="header-inner">
-
         <div class="brand-center">
-          <!-- عدّل الاسم إذا كان شعارك باسم مختلف -->
-          <img class="logo-img logo-big" src="assets/logo.png" alt="Logo">
-
-          <h1 class="school-title">DRIVING SCHOOL<br><span>Drive with DANY</span></h1>
-          <p class="sub">اختبار الدراجات النارية</p>
-
-          <nav class="contact">
-            <a class="pill" href="index.html">🏠 العودة للصفحة الرئيسية</a>
-          </nav>
+          <h1 class="quiz-title">اختبار الدراجات النارية</h1>
+          <p class="quiz-subtitle">اختر إجابة واحدة → أكد الإجابة → انتقل للسؤال التالي</p>
         </div>
-
       </div>
     </header>
 
     <main class="main">
       <section class="card quiz-card">
 
-        <div class="quiz-top">
-          <div class="quiz-progress" id="progress"></div>
-          <div class="quiz-score" id="scoreMini"></div>
+        <div class="quiz-topbar">
+          <div class="quiz-meta" id="metaRight">السؤال 1 من 30</div>
+          <div class="quiz-meta" id="metaLeft">النتيجة: 0</div>
+        </div>
+
+        <div class="quiz-progress-wrap">
+          <div class="quiz-progress-bar" id="progressBar"></div>
         </div>
 
         <h2 class="quiz-question" id="questionText"></h2>
 
-        <div class="quiz-choices" id="choices"></div>
+        <div class="quiz-options" id="choices"></div>
 
-        <div class="quiz-actions">
-          <button class="pill pill-primary" id="confirmBtn" disabled>تأكيد الإجابة</button>
+        <div class="quiz-controls">
           <button class="pill" id="nextBtn" disabled>السؤال التالي</button>
-
-          <button class="pill" id="restartBtn" style="display:none">إعادة الاختبار</button>
-          <button class="pill pill-primary" id="savePdfBtn" style="display:none">تحميل النتيجة PDF</button>
+          <button class="pill pill-primary" id="confirmBtn" disabled>تأكيد الإجابة</button>
         </div>
 
-        <p class="hint" id="resultHint" style="display:none"></p>
+        <div class="quiz-bottom">
+          <div class="quiz-status" id="statusText"></div>
+
+          <div class="quiz-finish" id="finishArea" style="display:none">
+            <button class="pill" id="restartBtn">إعادة الاختبار</button>
+            <button class="pill pill-primary" id="savePdfBtn">تحميل النتيجة PDF</button>
+          </div>
+
+          <p class="hint" id="lastSaved" style="margin-top:12px"></p>
+        </div>
 
       </section>
     </main>
@@ -67,7 +70,8 @@
 
   </div>
 
-  <script src="moto_questions.js?v=7"></script>
-  <script src="moto_quiz.js?v=7"></script>
+  <!-- ✅ ملفات JS داخل tests -->
+  <script src="./moto_questions.js?v=12"></script>
+  <script src="./moto_quiz.js?v=12"></script>
 </body>
 </html>
