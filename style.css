@@ -207,3 +207,83 @@ body{
     max-height: 220px !important;
   }
 }
+
+/* =========================
+   QUIZ PAGES (car / moto)
+   ========================= */
+
+.quiz-page .main{
+  min-height: calc(100vh - 160px);
+}
+
+.quiz-card{
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.quiz-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.quiz-progress{
+  font-weight:800;
+  color:var(--muted);
+}
+
+.quiz-score{
+  font-weight:800;
+  opacity:.9;
+}
+
+.quiz-question{
+  margin:10px 0 16px;
+  font-size:22px;
+  font-weight:800;
+  line-height:1.7;
+}
+
+.quiz-choices{
+  display:grid;
+  gap:12px;
+}
+
+.quiz-choices .btn{
+  text-align:right;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* أزرار التحكم */
+.quiz-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin-top:18px;
+}
+
+/* ✅ تلوين الاختيارات */
+.btn.correct{
+  border-color: rgba(34,197,94,.95) !important;
+}
+
+.btn.wrong{
+  border-color: rgba(239,68,68,.95) !important;
+}
+
+/* ✅ لون مختلف للدراجات (بدون لمس السيارة) */
+body.quiz-moto{
+  --accent:#a855f7;   /* بنفسجي */
+}
+body.quiz-moto .pill-primary{
+  background:rgba(168,85,247,.25);
+  border-color:rgba(168,85,247,.6);
+}
+body.quiz-moto .btn:hover{
+  border-color: rgba(168,85,247,.85);
+}
