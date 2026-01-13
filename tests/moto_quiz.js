@@ -2,22 +2,31 @@
 
 let idx = 0;
 let score = 0;
-let locked = false;
+let selected = null;
+let confirmed = false;
 
 const qEl = document.getElementById("questionText");
 const choicesEl = document.getElementById("choices");
 const progressEl = document.getElementById("progress");
+const scoreMiniEl = document.getElementById("scoreMini");
+
+const confirmBtn = document.getElementById("confirmBtn");
 const nextBtn = document.getElementById("nextBtn");
 const restartBtn = document.getElementById("restartBtn");
 const resultHint = document.getElementById("resultHint");
 const savePdfBtn = document.getElementById("savePdfBtn");
 
 function render(){
-  locked = false;
+  selected = null;
+  confirmed = false;
+
+  confirmBtn.disabled = true;
   nextBtn.disabled = true;
 
   const q = MOTO_QUESTIONS[idx];
   progressEl.textContent = `سؤال ${idx + 1} من ${MOTO_QUESTIONS.length}`;
+  scoreMiniEl.textContent = `النتيجة: ${score}/${MOTO_QUESTIONS.length}`;
+
   qEl.textContent = q.q;
 
   choicesEl.innerHTML = "";
@@ -27,44 +36,55 @@ function render(){
     btn.type = "button";
     btn.textContent = text;
 
-    btn.addEventListener("click", () => pick(i, btn));
+    btn.addEventListener("click", () => {
+      if (confirmed) return;
+
+      selected = i;
+      confirmBtn.disabled = false;
+
+      // إزالة التحديد القديم
+      [...choicesEl.children].forEach(b => {
+        b.style.borderColor = "rgba(255,255,255,.14)";
+        b.style.opacity = "0.92";
+        b.style.transform = "none";
+      });
+
+      // تمييز المختار
+      btn.style.opacity = "1";
+      btn.style.transform = "translateY(-2px)";
+      btn.style.borderColor = "rgba(79,140,255,.75)";
+    });
+
     choicesEl.appendChild(btn);
   });
 }
 
-function pick(i, btn){
-  if (locked) return;
-  locked = true;
+confirmBtn.addEventListener("click", () => {
+  if (selected === null || confirmed) return;
+
+  confirmed = true;
   nextBtn.disabled = false;
 
   const correct = MOTO_QUESTIONS[idx].correct;
 
-  // reset styles
-  [...choicesEl.children].forEach(b => {
-    b.style.borderColor = "rgba(255,255,255,.14)";
-    b.style.transform = "none";
-    b.style.opacity = "0.92";
-  });
+  const selectedBtn = choicesEl.children[selected];
+  const correctBtn = choicesEl.children[correct];
 
-  // highlight chosen
-  btn.style.opacity = "1";
-  btn.style.transform = "translateY(-2px)";
-
-  // show correct/wrong
-  if (i === correct) {
+  if (selected === correct){
     score++;
-    btn.style.borderColor = "rgba(34,197,94,.95)";
+    selectedBtn.classList.add("correct");
   } else {
-    btn.style.borderColor = "rgba(239,68,68,.95)";
-    // highlight correct
-    const correctBtn = choicesEl.children[correct];
-    if (correctBtn) correctBtn.style.borderColor = "rgba(34,197,94,.95)";
+    selectedBtn.classList.add("wrong");
+    if (correctBtn) correctBtn.classList.add("correct");
   }
-}
+
+  scoreMiniEl.textContent = `النتيجة: ${score}/${MOTO_QUESTIONS.length}`;
+});
 
 nextBtn.addEventListener("click", () => {
-  if (!locked) return;
+  if (!confirmed) return;
   idx++;
+
   if (idx >= MOTO_QUESTIONS.length) finish();
   else render();
 });
@@ -72,17 +92,21 @@ nextBtn.addEventListener("click", () => {
 restartBtn.addEventListener("click", () => {
   idx = 0;
   score = 0;
+
   restartBtn.style.display = "none";
   savePdfBtn.style.display = "none";
   resultHint.style.display = "none";
+
+  confirmBtn.style.display = "inline-flex";
   nextBtn.style.display = "inline-flex";
+
   render();
 });
 
 function finish(){
   choicesEl.innerHTML = "";
   progressEl.textContent = "انتهى الاختبار ✅";
-  qEl.textContent = "شكراً! يمكنك إعادة الاختبار أو حفظ النتيجة PDF.";
+  qEl.textContent = "تم إنهاء الاختبار. يمكنك إعادة المحاولة أو تحميل النتيجة PDF.";
 
   const percent = Math.round((score / MOTO_QUESTIONS.length) * 100);
   resultHint.style.display = "block";
@@ -90,6 +114,8 @@ function finish(){
 
   restartBtn.style.display = "inline-flex";
   savePdfBtn.style.display = "inline-flex";
+
+  confirmBtn.style.display = "none";
   nextBtn.style.display = "none";
 }
 
@@ -129,4 +155,3 @@ savePdfBtn.addEventListener("click", () => {
 
 // start
 render();
-
