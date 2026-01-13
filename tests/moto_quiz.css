@@ -1,1 +1,167 @@
+/* tests/moto_quiz.css */
+/* ستايل مطابق لصفحة السيارة لكن بلون مختلف للدراجات */
+
+:root{
+  --motoAccent:#a855f7; /* ✅ لون الدراجات (غيّره كما تريد) */
+  --motoAccentSoft: rgba(168,85,247,.25);
+  --motoBorder: rgba(255,255,255,.14);
+}
+
+.quiz-header{
+  background: rgba(0,0,0,.22);     /* ✅ أخف من السابق */
+  border-bottom: 1px solid var(--motoBorder);
+}
+
+.quiz-title{
+  margin: 0;
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.quiz-subtitle{
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.quiz-card{
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 22px;
+  border-radius: 20px;
+  background: rgba(10,15,30,.70);
+  border: 1px solid var(--motoBorder);
+  backdrop-filter: blur(10px);
+}
+
+/* الشريط الأعلى */
+.quiz-topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom: 10px;
+}
+
+.quiz-meta{
+  color: var(--muted);
+  font-weight: 800;
+}
+
+/* progress */
+.quiz-progress-wrap{
+  height: 8px;
+  background: rgba(255,255,255,.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 10px 0 18px;
+}
+.quiz-progress-bar{
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--motoAccentSoft), rgba(255,255,255,.18));
+}
+
+/* السؤال */
+.quiz-question{
+  margin: 0 0 18px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.7;
+}
+
+/* الخيارات */
+.quiz-options{
+  display: grid;
+  gap: 12px;
+}
+
+.quiz-option{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+
+  padding: 16px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--motoBorder);
+  background: rgba(255,255,255,.04);
+  cursor: pointer;
+  transition: .15s;
+}
+
+.quiz-option:hover{
+  transform: translateY(-1px);
+  border-color: rgba(168,85,247,.55);
+}
+
+.quiz-option.selected{
+  border-color: rgba(168,85,247,.9);
+  box-shadow: 0 0 0 2px rgba(168,85,247,.18) inset;
+}
+
+.quiz-option.correct{
+  border-color: rgba(34,197,94,.95);
+  box-shadow: 0 0 0 2px rgba(34,197,94,.15) inset;
+}
+.quiz-option.wrong{
+  border-color: rgba(239,68,68,.95);
+  box-shadow: 0 0 0 2px rgba(239,68,68,.12) inset;
+}
+
+.quiz-radio{
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.55);
+  flex: 0 0 auto;
+}
+.quiz-option.selected .quiz-radio{
+  border-color: rgba(168,85,247,.95);
+  box-shadow: 0 0 0 4px rgba(168,85,247,.22);
+}
+
+/* الأزرار تحت */
+.quiz-controls{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top: 16px;
+}
+
+/* اجعل زر التأكيد بنفسجي */
+.quiz-moto .pill-primary{
+  background: var(--motoAccentSoft);
+  border-color: rgba(168,85,247,.7);
+}
+
+/* الحالة */
+.quiz-bottom{
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-top: 12px;
+}
+
+.quiz-status{
+  font-weight: 800;
+  color: var(--muted);
+  min-height: 24px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.quiz-finish{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top: 12px;
+}
+
+@media (max-width:820px){
+  .quiz-title{font-size: 26px}
+  .quiz-card{padding: 16px}
+  .quiz-controls{justify-content:center}
+}
 
