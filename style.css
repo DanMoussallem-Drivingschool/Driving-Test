@@ -15,7 +15,7 @@ body{
 
   /* ✅ lighter overlay so background shows more */
   background:
-    linear-gradient(rgba(8,12,25,.52),rgba(8,12,25,.52)),
+    linear-gradient(rgba(8,12,25,.35),rgba(8,12,25,.35)),
     url("assets/driving-bg.png");
 
   background-size:cover;
