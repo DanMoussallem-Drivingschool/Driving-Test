@@ -1,1 +1,70 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبار سيارة عمومية - نموذج 3</title>
+
+  <link rel="stylesheet" href="../style.css?v=1" />
+  <link rel="stylesheet" href="public_quiz.css?v=1" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="brand-center">
+        <img class="logo-img logo-big" src="../assets/logo.png" alt="Logo" />
+        <h1 class="school-title" id="pqTitle">اختبار سيارة عمومية - نموذج 3</h1>
+        <div class="sub" id="pqSub"></div>
+      </div>
+
+      <nav class="contact">
+        <a class="pill" href="public_tests.html?v=1">↩️ رجوع لاختيار النماذج</a>
+        <a class="pill" href="../index.html?v=1">🏠 الرئيسية</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container pq-wrap">
+      <div class="pq-hero">
+        <div id="pqError" style="color:#ffb4b4; font-weight:900;"></div>
+      </div>
+
+      <section class="pq-card">
+        <div class="pq-meta">
+          <div id="pqMetaLeft">النتيجة: 0</div>
+          <div id="pqMetaRight">السؤال 1 من 27</div>
+        </div>
+
+        <div class="pq-progress"><div id="pqProgressBar"></div></div>
+
+        <div class="pq-question" id="pqQuestion"></div>
+        <div class="pq-choices" id="pqChoices"></div>
+
+        <div class="pq-hint" id="pqHint"></div>
+
+        <div class="pq-actions">
+          <button class="pq-btn primary" id="pqConfirm" type="button">تأكيد الإجابة</button>
+          <button class="pq-btn" id="pqNext" type="button">السؤال التالي</button>
+          <button class="pq-btn" id="pqRestart" type="button" style="display:none;">إعادة الاختبار</button>
+          <button class="pq-btn primary" id="pqPdf" type="button" style="display:none;">تحميل النتيجة PDF</button>
+        </div>
+
+        <div class="pq-result" id="pqResult" style="display:none;"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© جميع الحقوق محفوظة</div>
+  </footer>
+
+  <script>
+    window.QUIZ_TITLE = "اختبار قيادة سيارة عمومية - نموذج 3";
+  </script>
+  <script src="public_test3_questions.js?v=1"></script>
+  <script src="public_quiz.js?v=1"></script>
+</body>
+</html>
 
