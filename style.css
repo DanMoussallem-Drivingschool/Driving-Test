@@ -13,9 +13,9 @@ body{
   margin:0;
   font-family:"Cairo",system-ui,Tahoma,Arial;
 
-  /* ✅ lighter overlay so background shows more */
+  /* ✅ أخفّ overlay ليظهر المكان بالخلفية أكثر */
   background:
-    linear-gradient(rgba(8,12,25,.35),rgba(8,12,25,.35)),
+    linear-gradient(rgba(8,12,25,.22),rgba(8,12,25,.22)),
     url("assets/driving-bg.png");
 
   background-size:cover;
@@ -33,9 +33,9 @@ body{
 
 /* HEADER */
 .header{
-  /* ✅ more transparent */
-  background:rgba(0,0,0,.22);
-  backdrop-filter:blur(10px);
+  /* ✅ أخفّ غمقان + ✅ تقليل blur لأن blur يطمس الخلفية */
+  background:rgba(0,0,0,.14);
+  backdrop-filter:blur(6px);
   border-bottom:1px solid var(--border);
 }
 
@@ -115,6 +115,7 @@ body{
   text-decoration:none;
   transition:.2s;
 }
+
 .pill-license{
   background:rgba(79,140,255,.18);
   border-color:rgba(79,140,255,.45);
@@ -141,9 +142,11 @@ body{
 
 .card{
   width:100%;
-  /* ✅ more transparent so background is visible */
-  background:rgba(10,15,30,.60);
-  backdrop-filter:blur(10px);
+
+  /* ✅ أخفّ غمقان + ✅ تقليل blur (هو سبب “طمس” الخلفية خلف الكارد) */
+  background:rgba(10,15,30,.52);
+  backdrop-filter:blur(6px);
+
   padding:24px;
   border-radius:20px;
   border:1px solid var(--border);
@@ -193,8 +196,9 @@ body{
   margin-top:40px;
   padding:20px 0;
   text-align:center;
-  /* ✅ more transparent */
-  background:rgba(0,0,0,.30);
+
+  /* ✅ أخفّ */
+  background:rgba(0,0,0,.22);
   border-top:1px solid var(--border);
   color:var(--muted);
 }
@@ -202,10 +206,29 @@ body{
 /* MOBILE */
 @media(max-width:820px){
   .grid{grid-template-columns:1fr}
+
   .logo-big{
     width: 220px !important;
     max-height: 220px !important;
   }
+
+  /* ✅ مهم جداً للموبايل: fixed background تعمل مشاكل/ثقل في متصفحات كثيرة */
+  body{
+    background-attachment:scroll;
+    background-position:center top;
+  }
+
+  /* ✅ على الموبايل خفف الغمقان أكثر حتى يبان المكان */
+  body{
+    background:
+      linear-gradient(rgba(8,12,25,.16),rgba(8,12,25,.16)),
+      url("assets/driving-bg.png");
+    background-size:cover;
+  }
+
+  /* ✅ قلل blur أكثر على الموبايل */
+  .header{ backdrop-filter:blur(4px); }
+  .card{ backdrop-filter:blur(4px); }
 }
 
 /* =========================
@@ -286,32 +309,4 @@ body.quiz-moto .pill-primary{
 }
 body.quiz-moto .btn:hover{
   border-color: rgba(168,85,247,.85);
-}
-/* =========================
-   MOBILE FIX: background clarity
-   ========================= */
-@media (max-width: 820px){
-  /* على الموبايل fixed يعمل مشاكل */
-  body{
-    background-attachment: scroll !important;
-
-    /* أخف overlay على الموبايل حتى تظهر صورة المكان */
-    background:
-      linear-gradient(rgba(8,12,25,.16), rgba(8,12,25,.16)),
-      url("assets/driving-bg.png") !important;
-
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-  }
-
-  /* خفف تعتيم الهيدر والكارد على الموبايل */
-  .header{
-    background: rgba(0,0,0,.12) !important;
-    backdrop-filter: blur(8px);
-  }
-
-  .card{
-    background: rgba(10,15,30,.52) !important;
-  }
 }
