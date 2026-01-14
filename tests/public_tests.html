@@ -1,1 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبارات السيارة العمومية</title>
+
+  <!-- نستعمل ستايلك العام بدون تغيير -->
+  <link rel="stylesheet" href="../style.css?v=1" />
+
+  <style>
+    .cardx{
+      width:100%;
+      background:rgba(10,15,30,.78);
+      backdrop-filter:blur(10px);
+      padding:24px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 25px 70px rgba(0,0,0,.45);
+      max-width:900px;
+      margin:0 auto;
+    }
+    .gridx{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:14px;
+    }
+    .btnx{
+      padding:16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      text-decoration:none;
+      color:#eef2ff;
+      background:linear-gradient(180deg,rgba(79,140,255,.30),rgba(255,255,255,.06));
+      text-align:center;
+      font-weight:800;
+      transition:.2s;
+      display:block;
+    }
+    .btnx:hover{ transform:translateY(-2px); border-color:rgba(79,140,255,.75); }
+    .small{ color:#b8c0ff; margin-top:12px; line-height:1.7; }
+    @media(max-width:820px){ .gridx{grid-template-columns:1fr} }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="brand-center">
+        <!-- لو عندك لوجو في مكان آخر غيّر المسار -->
+        <img class="logo-img logo-big" src="../assets/logo.png" alt="Logo" />
+        <h1 class="school-title">اختبارات السيارة العمومية</h1>
+        <div class="sub">اختر نموذج الاختبار للتدريب</div>
+      </div>
+
+      <nav class="contact">
+        <a class="pill" href="../index.html?v=1">🏠 العودة للصفحة الرئيسية</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="cardx">
+        <div class="gridx">
+          <a class="btnx" href="public_test1.html?v=1">نموذج 1 (30 سؤال)</a>
+          <a class="btnx" href="public_test2.html?v=1">نموذج 2 (30 سؤال)</a>
+          <a class="btnx" href="public_test3.html?v=1">نموذج 3 (27 سؤال)</a>
+        </div>
+
+        <div class="small">
+          ✅ نفس أسلوب الاختبار: اختيار إجابة → تأكيد → يظهر صح/غلط → التالي.<br/>
+          ✅ عند النهاية يمكنك طباعة النتيجة كـ PDF (Print).
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© جميع الحقوق محفوظة</div>
+  </footer>
+</body>
+</html>
 
