@@ -287,3 +287,31 @@ body.quiz-moto .pill-primary{
 body.quiz-moto .btn:hover{
   border-color: rgba(168,85,247,.85);
 }
+/* =========================
+   MOBILE FIX: background clarity
+   ========================= */
+@media (max-width: 820px){
+  /* على الموبايل fixed يعمل مشاكل */
+  body{
+    background-attachment: scroll !important;
+
+    /* أخف overlay على الموبايل حتى تظهر صورة المكان */
+    background:
+      linear-gradient(rgba(8,12,25,.16), rgba(8,12,25,.16)),
+      url("assets/driving-bg.png") !important;
+
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* خفف تعتيم الهيدر والكارد على الموبايل */
+  .header{
+    background: rgba(0,0,0,.12) !important;
+    backdrop-filter: blur(8px);
+  }
+
+  .card{
+    background: rgba(10,15,30,.52) !important;
+  }
+}
