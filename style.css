@@ -47,7 +47,7 @@ body{
 /* HEADER */
 .header{
   background:rgba(0,0,0,.18);
-  backdrop-filter:blur(8px);
+  backdrop-filter:blur(2px);
   border-bottom:1px solid var(--border);
 }
 
@@ -151,7 +151,7 @@ body{
 .card{
   width:100%;
   background:rgba(10,15,30,.55);
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(4px);
   padding:24px;
   border-radius:20px;
   border:1px solid var(--border);
