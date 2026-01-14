@@ -1,1 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>اختبار سيارة خصوصي (30 سؤال)</title>
+
+  <!-- استخدم نفس ستايلك الأساسي -->
+  <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body class="quiz-page">
+  <header class="header">
+    <div class="container header-inner">
+      <div class="brand-center">
+        <!-- نفس اللوجو إذا تحب -->
+        <img class="logo-img logo-big" src="../assets/logo.png" alt="Drive with DANY" onerror="this.style.display='none'">
+        <h1 class="school-title">اختبار سيارة خصوصي</h1>
+        <div class="sub">اختر إجابة واحدة — ثم أكد الإجابة — ثم انتقل للسؤال التالي</div>
+      </div>
+
+      <div class="contact">
+        <a class="pill" href="../index.html">⬅️ رجوع للرئيسية</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="card quiz-card">
+        <div class="quiz-top">
+          <div class="quiz-score" id="scoreBox">النتيجة: 0</div>
+          <div class="quiz-progress" id="progressBox">السؤال 1 من 30</div>
+        </div>
+
+        <div class="quiz-progressbar" style="height:10px;background:#e9efff;border-radius:999px;overflow:hidden;margin:10px 0 18px;">
+          <div id="bar" style="height:100%;width:0%;background:#5b6cff;"></div>
+        </div>
+
+        <div id="qImageWrap" style="display:none;margin-bottom:12px;text-align:center;">
+          <img id="qImage" alt="sign" style="max-width:360px;width:100%;height:auto;border-radius:14px;border:1px solid rgba(0,0,0,.08);background:#fff;">
+        </div>
+
+        <div class="quiz-question" id="questionText"></div>
+
+        <div class="quiz-choices" id="choices"></div>
+
+        <div class="quiz-actions">
+          <button class="pill pill-primary" id="confirmBtn" disabled>تأكيد الإجابة</button>
+          <button class="pill" id="nextBtn" disabled>السؤال التالي</button>
+          <button class="pill" id="restartBtn">إعادة الاختبار</button>
+        </div>
+
+        <div class="hint" id="hintBox"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="./private_car_questions.js"></script>
+  <script src="./private_car_quiz.js"></script>
+</body>
+</html>
 
