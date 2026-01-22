@@ -7,10 +7,16 @@
   const MODE = window.SIGNS_MODE || "study"; // "study" or "quiz"
 
   // Assets folder is in /assets, pages are in /tests => use ../assets/...
-  function signImgPath(id) {
-    const num = String(id).padStart(4, "0");
-    return `../assets/signs_ar/sign_${num}.webp`;
-  }
+  // Assets folder is in /assets, pages are in /tests => use ../assets/...
+function signImgPath(id) {
+  const num = String(id).padStart(4, "0");
+
+  // ✅ Your real folder (based on your repo screenshot)
+  const base = window.SIGNS_ASSETS_BASE || "../assets/signs/signs_ar/";
+
+  return `${base}sign_${num}.webp`;
+}
+
 
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
