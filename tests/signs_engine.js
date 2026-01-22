@@ -6,17 +6,12 @@
   const DATA = window.SIGNS_DATA || window.SIGNS || [];
   const MODE = window.SIGNS_MODE || "study"; // "study" or "quiz"
 
-  // Assets folder is in /assets, pages are in /tests => use ../assets/...
-  // Assets folder is in /assets, pages are in /tests => use ../assets/...
-function signImgPath(id) {
-  const num = String(id).padStart(4, "0");
-
-  // ✅ Your real folder (based on your repo screenshot)
-  const base = window.SIGNS_ASSETS_BASE || "../assets/signs/signs_ar/";
-
-  return `${base}sign_${num}.webp`;
-}
-
+  // ✅ FIXED: use correct folder + allow override from HTML
+  function signImgPath(id) {
+    const num = String(id).padStart(4, "0");
+    const base = window.SIGNS_ASSETS_BASE || "../assets/signs/signs_ar/";
+    return `${base}sign_${num}.webp`;
+  }
 
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -80,7 +75,6 @@ function signImgPath(id) {
 
     order = filtered.map(x => x.id);
 
-    // إذا فلترت وما عاد في شيء
     if (order.length === 0) {
       const box = qs("#errorBox");
       if (box) box.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
@@ -113,7 +107,6 @@ function signImgPath(id) {
       elImg.src = signImgPath(item.id);
       elImg.alt = item.ar || item.en || "Traffic sign";
       elImg.onerror = () => {
-        // يظهر رسالة بدل صورة مكسورة
         elImg.alt = "❌ صورة غير موجودة";
       };
     }
@@ -122,7 +115,6 @@ function signImgPath(id) {
   }
 
   function buildChoices(correctItem) {
-    // 3 خيارات: واحدة صحيحة + 2 عشوائي
     const pool = filtered.filter(x => x.id !== correctItem.id);
     shuffle(pool);
     const wrong1 = pool[0] || correctItem;
@@ -140,7 +132,7 @@ function signImgPath(id) {
   let selectedIndex = null;
   let confirmed = false;
   let score = 0;
-  let answersLog = []; // لتقرير النتائج لاحقاً
+  let answersLog = [];
 
   function renderQuiz() {
     const item = currentItem();
@@ -150,7 +142,7 @@ function signImgPath(id) {
       elImg.src = signImgPath(item.id);
       elImg.alt = item.ar || item.en || "Traffic sign";
     }
-    if (elName) elName.textContent = ""; // بالاختبار نخفي العنوان
+    if (elName) elName.textContent = "";
     if (elCat) elCat.textContent = item.category || "عام";
     renderMeta();
 
@@ -198,7 +190,6 @@ function signImgPath(id) {
     const selected = choices[selectedIndex];
     const isCorrect = selected && selected.id === correctId;
 
-    // ألوان
     [...elChoices.children].forEach((btn, i) => {
       btn.disabled = true;
       btn.classList.remove("correct","wrong");
@@ -222,9 +213,9 @@ function signImgPath(id) {
   }
 
   function next() {
-    if (MODE === "quiz" && !confirmed) return; // لازم تأكيد
+    if (MODE === "quiz" && !confirmed) return;
     idx++;
-    if (idx >= order.length) idx = 0; // نرجع لأول
+    if (idx >= order.length) idx = 0;
     render();
   }
 
@@ -235,7 +226,6 @@ function signImgPath(id) {
   }
 
   function randomizeOrder() {
-    // ترتيب عشوائي لكل إعادة/ضغط
     const ids = order.slice();
     shuffle(ids);
     order = ids;
@@ -266,4 +256,3 @@ function signImgPath(id) {
   // ---- Start ----
   render();
 })();
-
