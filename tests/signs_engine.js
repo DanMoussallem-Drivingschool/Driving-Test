@@ -2,16 +2,8 @@
 (function () {
   "use strict";
 
-  // ---- Config ----
-  const DATA = window.SIGNS_DATA || window.SIGNS || [];
-  const MODE = window.SIGNS_MODE || "study"; // "study" or "quiz"
-
-  // ✅ FIXED: use correct folder + allow override from HTML
-  function signImgPath(id) {
-    const num = String(id).padStart(4, "0");
-    const base = window.SIGNS_ASSETS_BASE || "../assets/signs/signs_ar/";
-    return `${base}sign_${num}.webp`;
-  }
+  const DATA = window.SIGNS_DATA || [];
+  const MODE = window.SIGNS_MODE || "study"; // "study" | "quiz"
 
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -20,16 +12,26 @@
     }
     return arr;
   }
-
-  function qs(sel) { return document.querySelector(sel); }
+  const qs = (s) => document.querySelector(s);
 
   if (!Array.isArray(DATA) || DATA.length === 0) {
     const box = qs("#errorBox");
-    if (box) box.textContent = "⚠️ لم يتم تحميل بيانات العلامات. تأكد من signs_data.js";
+    if (box) box.textContent = "⚠️ لا توجد بيانات في signs_data.js بعد. افتح صفحة الإدارة لتوليد البيانات.";
     return;
   }
 
-  // ---- Elements (shared) ----
+  // IMPORTANT: assets are in /assets/... and pages are in /tests => ../assets/...
+  function signImgPath(item) {
+    // Prefer explicit file
+    if (item.file) return `../assets/signs_ar/${item.file}`;
+    // Backward fallback (id -> sign_0001.webp)
+    if (typeof item.id === "number") {
+      const num = String(item.id).padStart(4, "0");
+      return `../assets/signs_ar/sign_${num}.webp`;
+    }
+    return "";
+  }
+
   const elTitle = qs("#pageTitle");
   const elMeta  = qs("#metaBox");
   const elImg   = qs("#signImg");
@@ -40,56 +42,62 @@
   const btnNext = qs("#btnNext");
   const btnRand = qs("#btnRand");
 
-  // Quiz-only
   const quizBox = qs("#quizBox");
   const elQText = qs("#questionText");
   const elChoices = qs("#choices");
   const btnConfirm = qs("#confirmBtn");
 
-  // Filters
   const catSel = qs("#catFilter");
   const searchInp = qs("#searchInp");
 
-  // ---- Build categories ----
-  const categories = Array.from(new Set(DATA.map(x => x.category || "عام"))).sort((a,b)=>a.localeCompare(b,"ar"));
+  // ---- Categories ----
+  const categories = Array.from(new Set(DATA.map(x => x.category || "عام")))
+    .sort((a,b)=>a.localeCompare(b,"ar"));
+
   if (catSel) {
-    catSel.innerHTML = `<option value="__all__">كل الفئات</option>` +
-      categories.map(c => `<option value="${c}">${c}</option>`).join("");
+    catSel.innerHTML =
+      `<option value="__all__">كل الفئات</option>` +
+      categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
   }
 
   let filtered = DATA.slice();
-  let order = filtered.map(x => x.id);
+  let order = filtered.map((_, i) => i); // store indices
   let idx = 0;
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;").replaceAll("<","&lt;")
+      .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
 
   function applyFilters() {
     const c = catSel ? catSel.value : "__all__";
-    const s = (searchInp ? searchInp.value : "").trim();
+    const s = (searchInp ? searchInp.value : "").trim().toLowerCase();
 
     filtered = DATA.filter(item => {
       const catOk = (c === "__all__") || ((item.category || "عام") === c);
       if (!catOk) return false;
       if (!s) return true;
       const hay = `${item.ar || ""} ${item.en || ""} ${item.category || ""}`.toLowerCase();
-      return hay.includes(s.toLowerCase());
+      return hay.includes(s);
     });
 
-    order = filtered.map(x => x.id);
+    order = filtered.map((_, i) => i);
+    idx = 0;
 
+    const box = qs("#errorBox");
     if (order.length === 0) {
-      const box = qs("#errorBox");
       if (box) box.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
       return;
     }
-
-    idx = 0;
-    const box = qs("#errorBox");
     if (box) box.textContent = "";
     render();
   }
 
   function currentItem() {
-    const id = order[idx];
-    return filtered.find(x => x.id === id) || filtered[idx] || DATA[0];
+    const i = order[idx];
+    return filtered[i] || DATA[0];
   }
 
   function renderMeta() {
@@ -104,42 +112,36 @@
     if (elCat) elCat.textContent = item.category || "عام";
 
     if (elImg) {
-      elImg.src = signImgPath(item.id);
+      elImg.src = signImgPath(item);
       elImg.alt = item.ar || item.en || "Traffic sign";
-      elImg.onerror = () => {
-        elImg.alt = "❌ صورة غير موجودة";
-      };
+      elImg.onerror = () => { elImg.alt = "❌ صورة غير موجودة"; };
     }
-
     renderMeta();
   }
 
   function buildChoices(correctItem) {
-    const pool = filtered.filter(x => x.id !== correctItem.id);
+    const pool = filtered.filter(x => x !== correctItem);
     shuffle(pool);
     const wrong1 = pool[0] || correctItem;
     const wrong2 = pool[1] || correctItem;
 
-    const choices = shuffle([
-      { text: (correctItem.ar || correctItem.en), id: correctItem.id, correct: true },
-      { text: (wrong1.ar || wrong1.en), id: wrong1.id, correct: false },
-      { text: (wrong2.ar || wrong2.en), id: wrong2.id, correct: false },
+    return shuffle([
+      { text: (correctItem.ar || correctItem.en), ref: correctItem, correct: true },
+      { text: (wrong1.ar || wrong1.en), ref: wrong1, correct: false },
+      { text: (wrong2.ar || wrong2.en), ref: wrong2, correct: false },
     ]);
-
-    return choices;
   }
 
   let selectedIndex = null;
   let confirmed = false;
   let score = 0;
-  let answersLog = [];
 
   function renderQuiz() {
     const item = currentItem();
 
     if (elTitle) elTitle.textContent = "اختبار العلامات المرورية";
     if (elImg) {
-      elImg.src = signImgPath(item.id);
+      elImg.src = signImgPath(item);
       elImg.alt = item.ar || item.en || "Traffic sign";
     }
     if (elName) elName.textContent = "";
@@ -150,11 +152,12 @@
     selectedIndex = null;
 
     if (!quizBox) return;
+    quizBox.style.display = "block";
     if (elQText) elQText.textContent = "ما معنى هذه الإشارة؟";
 
     const choices = buildChoices(item);
-    quizBox.dataset.correctId = String(item.id);
-    quizBox.dataset.choices = JSON.stringify(choices);
+    quizBox._choices = choices;
+    quizBox._correct = item;
 
     elChoices.innerHTML = "";
     choices.forEach((c, i) => {
@@ -178,35 +181,22 @@
   }
 
   function confirmAnswer() {
-    if (confirmed) return;
-    if (selectedIndex === null) return;
-
+    if (confirmed || selectedIndex === null) return;
     confirmed = true;
 
-    const item = currentItem();
-    const correctId = Number(quizBox.dataset.correctId);
-    const choices = JSON.parse(quizBox.dataset.choices || "[]");
-
+    const choices = quizBox._choices || [];
+    const correctItem = quizBox._correct;
     const selected = choices[selectedIndex];
-    const isCorrect = selected && selected.id === correctId;
+
+    const isCorrect = selected && selected.ref === correctItem;
+    if (isCorrect) score++;
 
     [...elChoices.children].forEach((btn, i) => {
       btn.disabled = true;
       btn.classList.remove("correct","wrong");
       const c = choices[i];
-      if (c && c.id === correctId) btn.classList.add("correct");
+      if (c && c.ref === correctItem) btn.classList.add("correct");
       if (i === selectedIndex && !isCorrect) btn.classList.add("wrong");
-    });
-
-    if (isCorrect) score++;
-
-    answersLog.push({
-      id: item.id,
-      img: signImgPath(item.id),
-      correctText: (item.ar || item.en),
-      selectedText: selected ? selected.text : "",
-      ok: !!isCorrect,
-      category: item.category || "عام"
     });
 
     if (btnConfirm) btnConfirm.disabled = true;
@@ -218,13 +208,11 @@
     if (idx >= order.length) idx = 0;
     render();
   }
-
   function prev() {
     idx--;
     if (idx < 0) idx = order.length - 1;
     render();
   }
-
   function randomizeOrder() {
     const ids = order.slice();
     shuffle(ids);
@@ -234,25 +222,19 @@
   }
 
   function render() {
-    if (MODE === "quiz") {
-      if (quizBox) quizBox.style.display = "block";
-      renderQuiz();
-    } else {
+    if (MODE === "quiz") renderQuiz();
+    else {
       if (quizBox) quizBox.style.display = "none";
       renderStudy();
     }
   }
 
-  // ---- Events ----
   if (btnPrev) btnPrev.addEventListener("click", prev);
   if (btnNext) btnNext.addEventListener("click", next);
   if (btnRand) btnRand.addEventListener("click", randomizeOrder);
-
   if (btnConfirm) btnConfirm.addEventListener("click", confirmAnswer);
-
   if (catSel) catSel.addEventListener("change", applyFilters);
   if (searchInp) searchInp.addEventListener("input", applyFilters);
 
-  // ---- Start ----
   render();
 })();
