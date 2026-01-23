@@ -5,17 +5,33 @@
   const DATA = window.SIGNS_DATA || window.SIGNS || [];
   const MODE = window.SIGNS_MODE || "study"; // "study" or "quiz"
 
-  // ✅ Try multiple possible folders (because your repo structure changed between branches)
-  const BASE_PATHS = [
-    "../assets/signs/signs_ar/",  // assets/signs/signs_ar/
-    "../assets/signs_ar/",        // assets/signs_ar/
-  ];
+  // --- Language (AR/EN) ---
+  const LS_KEY = "SIGNS_LANG";
+  let lang = (localStorage.getItem(LS_KEY) || "ar").toLowerCase(); // "ar" | "en"
 
-  function pad4(n) { return String(n).padStart(4, "0"); }
+  function getLabel(item) {
+    return (lang === "en" ? (item.en || item.ar) : (item.ar || item.en)) || "—";
+  }
 
-  function getFile(item) {
-    if (item && item.file) return item.file;
-    return `sign_${pad4(item.id || 1)}.webp`;
+  function setLang(next) {
+    lang = next;
+    localStorage.setItem(LS_KEY, lang);
+    const b = document.getElementById("langBtn");
+    if (b) b.textContent = (lang === "en" ? "EN" : "AR");
+    render();
+  }
+
+  function toggleLang() {
+    setLang(lang === "ar" ? "en" : "ar");
+  }
+
+  // Assets folder is in /assets, pages are in /tests => use ../assets/...
+  function signImgPath(item) {
+    // Prefer explicit file name from dataset
+    if (item && item.file) return `../assets/signs_ar/${item.file}`;
+    // Fallback to ID padding
+    const num = String(item.id || 0).padStart(4, "0");
+    return `../assets/signs_ar/sign_${num}.webp`;
   }
 
   function shuffle(arr) {
@@ -34,25 +50,30 @@
     return;
   }
 
+  // ---- Elements ----
   const elTitle = qs("#pageTitle");
   const elMeta  = qs("#metaBox");
   const elImg   = qs("#signImg");
   const elName  = qs("#signName");
   const elCat   = qs("#signCat");
+  const elTopMsg = qs("#topMsg"); // optional message box
 
   const btnPrev = qs("#btnPrev");
   const btnNext = qs("#btnNext");
   const btnRand = qs("#btnRand");
+  const btnLang = qs("#langBtn"); // new
 
+  // Quiz-only
   const quizBox = qs("#quizBox");
   const elQText = qs("#questionText");
   const elChoices = qs("#choices");
   const btnConfirm = qs("#confirmBtn");
 
+  // Filters (optional if you later add categories)
   const catSel = qs("#catFilter");
   const searchInp = qs("#searchInp");
-  const errorBox = qs("#errorBox");
 
+  // ---- Categories (if missing -> "عام") ----
   const categories = Array.from(new Set(DATA.map(x => x.category || "عام")))
     .sort((a,b)=>a.localeCompare(b,"ar"));
 
@@ -63,6 +84,7 @@
   }
 
   let filtered = DATA.slice();
+  let order = filtered.map(x => x.id);
   let idx = 0;
 
   function applyFilters() {
@@ -70,98 +92,110 @@
     const s = (searchInp ? searchInp.value : "").trim().toLowerCase();
 
     filtered = DATA.filter(item => {
-      const catOk = (c === "__all__") || ((item.category || "عام") === c);
+      const cat = item.category || "عام";
+      const catOk = (c === "__all__") || (cat === c);
       if (!catOk) return false;
+
       if (!s) return true;
-      const hay = `${item.ar || ""} ${item.en || ""} ${item.category || ""}`.toLowerCase();
+      const hay = `${item.ar || ""} ${item.en || ""} ${cat}`.toLowerCase();
       return hay.includes(s);
     });
 
-    if (filtered.length === 0) {
-      if (errorBox) errorBox.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
+    order = filtered.map(x => x.id);
+
+    const box = qs("#errorBox");
+    if (order.length === 0) {
+      if (box) box.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
       return;
     }
-
+    if (box) box.textContent = "";
     idx = 0;
-    if (errorBox) errorBox.textContent = "";
     render();
   }
 
-  function currentItem() { return filtered[idx] || DATA[0]; }
-
-  function renderMeta() {
-    if (!elMeta) return;
-    elMeta.textContent = `الإشارة ${idx + 1} من ${filtered.length}`;
+  function currentItem() {
+    const id = order[idx];
+    return filtered.find(x => x.id === id) || filtered[idx] || DATA[0];
   }
 
-  // ✅ Try paths until one works
-  function setImage(item) {
-    if (!elImg) return;
+  function renderMeta() {
+    if (elMeta) elMeta.textContent = `الإشارة ${idx + 1} من ${order.length}`;
+  }
 
-    const file = getFile(item);
-    let p = 0;
-
-    function tryNext() {
-      if (p >= BASE_PATHS.length) {
-        elImg.removeAttribute("src");
-        elImg.alt = "❌ صورة غير موجودة";
-        if (errorBox) errorBox.textContent = `⚠️ صورة غير موجودة: ${file}`;
-        return;
-      }
-      const src = BASE_PATHS[p] + file;
-      p++;
-
-      elImg.onerror = () => tryNext();
-      elImg.src = src;
-      elImg.alt = item.ar || item.en || "Traffic sign";
-    }
-
-    tryNext();
+  function setTopMsg(msg) {
+    if (!elTopMsg) return;
+    elTopMsg.textContent = msg || "";
+    elTopMsg.style.display = msg ? "block" : "none";
   }
 
   function renderStudy() {
     const item = currentItem();
+
     if (elTitle) elTitle.textContent = "تعلم العلامات المرورية";
-    if (elName) elName.textContent = item.ar || item.en || "—";
+    if (elName) elName.textContent = getLabel(item);
     if (elCat) elCat.textContent = item.category || "عام";
-    if (errorBox) errorBox.textContent = "";
-    setImage(item);
+
+    if (elImg) {
+      const src = signImgPath(item);
+      elImg.onerror = null;
+      elImg.src = src;
+      elImg.alt = getLabel(item);
+
+      elImg.onerror = () => {
+        setTopMsg(`⚠️ صورة غير موجودة: ${item.file || ""}`.trim());
+      };
+      setTopMsg(""); // clear if ok
+    }
+
     renderMeta();
   }
 
   function buildChoices(correctItem) {
-    const pool = filtered.filter(x => x !== correctItem);
+    const pool = filtered.filter(x => x.id !== correctItem.id);
     shuffle(pool);
+
     const wrong1 = pool[0] || correctItem;
     const wrong2 = pool[1] || correctItem;
 
     return shuffle([
-      { text: (correctItem.ar || correctItem.en), item: correctItem, correct: true },
-      { text: (wrong1.ar || wrong1.en), item: wrong1, correct: false },
-      { text: (wrong2.ar || wrong2.en), item: wrong2, correct: false },
+      { text: getLabel(correctItem), id: correctItem.id },
+      { text: getLabel(wrong1), id: wrong1.id },
+      { text: getLabel(wrong2), id: wrong2.id },
     ]);
   }
 
   let selectedIndex = null;
   let confirmed = false;
+  let score = 0;
 
   function renderQuiz() {
     const item = currentItem();
+
     if (elTitle) elTitle.textContent = "اختبار العلامات المرورية";
-    if (elName) elName.textContent = "";
     if (elCat) elCat.textContent = item.category || "عام";
-    if (errorBox) errorBox.textContent = "";
-    setImage(item);
+    if (elName) elName.textContent = ""; // hide name in quiz
     renderMeta();
+
+    if (elImg) {
+      const src = signImgPath(item);
+      elImg.onerror = null;
+      elImg.src = src;
+      elImg.alt = "Traffic sign";
+
+      elImg.onerror = () => {
+        setTopMsg(`⚠️ صورة غير موجودة: ${item.file || ""}`.trim());
+      };
+      setTopMsg("");
+    }
 
     confirmed = false;
     selectedIndex = null;
 
-    if (!quizBox) return;
-    if (elQText) elQText.textContent = "ما معنى هذه الإشارة؟";
+    if (quizBox) quizBox.style.display = "block";
+    if (elQText) elQText.textContent = (lang === "en" ? "What does this sign mean?" : "ما معنى هذه الإشارة؟");
 
     const choices = buildChoices(item);
-    quizBox.dataset.correct = item.ar || item.en || "";
+    quizBox.dataset.correctId = String(item.id);
     quizBox.dataset.choices = JSON.stringify(choices);
 
     elChoices.innerHTML = "";
@@ -189,56 +223,64 @@
     if (confirmed || selectedIndex === null) return;
     confirmed = true;
 
+    const correctId = Number(quizBox.dataset.correctId);
     const choices = JSON.parse(quizBox.dataset.choices || "[]");
     const selected = choices[selectedIndex];
-    const correctText = quizBox.dataset.correct;
-
-    const isCorrect = selected && selected.text === correctText;
+    const isCorrect = selected && selected.id === correctId;
 
     [...elChoices.children].forEach((btn, i) => {
       btn.disabled = true;
       btn.classList.remove("correct","wrong");
-      if (choices[i] && choices[i].text === correctText) btn.classList.add("correct");
+      const c = choices[i];
+      if (c && c.id === correctId) btn.classList.add("correct");
       if (i === selectedIndex && !isCorrect) btn.classList.add("wrong");
     });
+
+    if (isCorrect) score++;
 
     if (btnConfirm) btnConfirm.disabled = true;
   }
 
   function next() {
     if (MODE === "quiz" && !confirmed) return;
-    idx = (idx + 1) % filtered.length;
+    idx++;
+    if (idx >= order.length) idx = 0;
     render();
   }
 
   function prev() {
-    idx = (idx - 1 + filtered.length) % filtered.length;
+    idx--;
+    if (idx < 0) idx = order.length - 1;
     render();
   }
 
   function randomizeOrder() {
-    shuffle(filtered);
+    const ids = order.slice();
+    shuffle(ids);
+    order = ids;
     idx = 0;
     render();
   }
 
   function render() {
-    if (MODE === "quiz") {
-      if (quizBox) quizBox.style.display = "block";
-      renderQuiz();
-    } else {
-      if (quizBox) quizBox.style.display = "none";
-      renderStudy();
-    }
+    // Update lang button label
+    if (btnLang) btnLang.textContent = (lang === "en" ? "EN" : "AR");
+
+    if (MODE === "quiz") renderQuiz();
+    else renderStudy();
   }
 
+  // ---- Events ----
   if (btnPrev) btnPrev.addEventListener("click", prev);
   if (btnNext) btnNext.addEventListener("click", next);
   if (btnRand) btnRand.addEventListener("click", randomizeOrder);
   if (btnConfirm) btnConfirm.addEventListener("click", confirmAnswer);
 
+  if (btnLang) btnLang.addEventListener("click", toggleLang);
+
   if (catSel) catSel.addEventListener("change", applyFilters);
   if (searchInp) searchInp.addEventListener("input", applyFilters);
 
+  // ---- Start ----
   render();
 })();
