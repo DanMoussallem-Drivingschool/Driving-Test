@@ -2,50 +2,19 @@
 (function () {
   "use strict";
 
-  const DATA_RAW = window.SIGNS_DATA || window.SIGNS || [];
+  // ---- Config ----
+  const DATA = window.SIGNS_DATA || window.SIGNS || [];
   const MODE = window.SIGNS_MODE || "study"; // "study" or "quiz"
 
-  function qs(sel) { return document.querySelector(sel); }
-
-  // ✅ Use file mapping first (sign_0001.webp, ...)
+  // ✅ correct folder (repo has: assets/signs/signs_ar/)
   function signImgPath(item) {
-    if (item && item.file) return `../assets/signs_ar/${item.file}`;
-    const n = Number(item && item.id ? item.id : 0);
-    const num = String(n).padStart(4, "0");
-    return `../assets/signs_ar/sign_${num}.webp`;
-  }
-
-  // infer id from file if needed
-  function idFromFile(file) {
-    const m = String(file || "").match(/sign_(\d+)\.webp/i);
-    return m ? Number(m[1]) : null;
-  }
-
-  // basic category inference (only if dataset doesn't provide category)
-  function inferCategory(item) {
-    if (item.category) return item.category;
-    const n = (item.file ? idFromFile(item.file) : null) ?? Number(item.id || 0);
-
-    // Simple Lebanese-style grouping by typical blocks
-    if (n >= 1 && n <= 29) return "إشارات تنظيمية";
-    if (n >= 30 && n <= 58) return "إشارات تحذيرية";
-    if (n >= 59 && n <= 73) return "إشارات إلزامية";
-    if (n >= 74 && n <= 87) return "إشارات إرشادية";
-    return "علامات/خطوط/إشارات أخرى";
-  }
-
-  function normalizeData(raw) {
-    return raw
-      .filter(Boolean)
-      .map((x, i) => {
-        const fid = x.file ? idFromFile(x.file) : null;
-        const key = (fid ?? x.id ?? (i + 1));
-        return {
-          ...x,
-          _key: key,
-          category: x.category || inferCategory({ ...x, id: key }),
-        };
-      });
+    // prefer explicit filename from data
+    if (item && item.file) {
+      return `../assets/signs/signs_ar/${item.file}`;
+    }
+    // fallback to id-based filename
+    const num = String(item.id || 1).padStart(4, "0");
+    return `../assets/signs/signs_ar/sign_${num}.webp`;
   }
 
   function shuffle(arr) {
@@ -56,7 +25,7 @@
     return arr;
   }
 
-  const DATA = normalizeData(DATA_RAW);
+  function qs(sel) { return document.querySelector(sel); }
 
   if (!Array.isArray(DATA) || DATA.length === 0) {
     const box = qs("#errorBox");
@@ -64,7 +33,7 @@
     return;
   }
 
-  // ---- Elements ----
+  // ---- Elements (shared) ----
   const elTitle = qs("#pageTitle");
   const elMeta  = qs("#metaBox");
   const elImg   = qs("#signImg");
@@ -85,7 +54,7 @@
   const catSel = qs("#catFilter");
   const searchInp = qs("#searchInp");
 
-  // ---- Categories ----
+  // ---- Build categories ----
   const categories = Array.from(new Set(DATA.map(x => x.category || "عام")))
     .sort((a,b)=>a.localeCompare(b,"ar"));
 
@@ -96,7 +65,6 @@
   }
 
   let filtered = DATA.slice();
-  let order = filtered.map(x => x._key);
   let idx = 0;
 
   function applyFilters() {
@@ -106,30 +74,47 @@
     filtered = DATA.filter(item => {
       const catOk = (c === "__all__") || ((item.category || "عام") === c);
       if (!catOk) return false;
+
       if (!s) return true;
       const hay = `${item.ar || ""} ${item.en || ""} ${item.category || ""}`.toLowerCase();
       return hay.includes(s);
     });
 
-    order = filtered.map(x => x._key);
-
-    const box = qs("#errorBox");
-    if (order.length === 0) {
+    if (filtered.length === 0) {
+      const box = qs("#errorBox");
       if (box) box.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
       return;
     }
-    if (box) box.textContent = "";
+
     idx = 0;
+    const box = qs("#errorBox");
+    if (box) box.textContent = "";
     render();
   }
 
   function currentItem() {
-    const key = order[idx];
-    return filtered.find(x => x._key === key) || filtered[idx] || DATA[0];
+    return filtered[idx] || DATA[0];
   }
 
   function renderMeta() {
-    if (elMeta) elMeta.textContent = `الإشارة ${idx + 1} من ${order.length}`;
+    if (!elMeta) return;
+    elMeta.textContent = `الإشارة ${idx + 1} من ${filtered.length}`;
+  }
+
+  function setImage(item) {
+    if (!elImg) return;
+
+    elImg.onerror = null;
+    elImg.src = signImgPath(item);
+    elImg.alt = item.ar || item.en || "Traffic sign";
+
+    elImg.onerror = () => {
+      // show a clear message if not found
+      elImg.removeAttribute("src");
+      elImg.alt = "❌ صورة غير موجودة";
+      const box = qs("#errorBox");
+      if (box) box.textContent = `⚠️ صورة غير موجودة: ${item.file || ("sign_" + String(item.id).padStart(4,"0") + ".webp")}`;
+    };
   }
 
   function renderStudy() {
@@ -137,28 +122,23 @@
 
     if (elTitle) elTitle.textContent = "تعلم العلامات المرورية";
     if (elName) elName.textContent = item.ar || item.en || "—";
-    if (elCat)  elCat.textContent  = item.category || "عام";
+    if (elCat) elCat.textContent = item.category || "عام";
 
-    if (elImg) {
-      elImg.src = signImgPath(item);
-      elImg.alt = item.ar || item.en || "Traffic sign";
-      elImg.onerror = () => { elImg.alt = "❌ صورة غير موجودة"; };
-    }
-
+    setImage(item);
     renderMeta();
   }
 
   function buildChoices(correctItem) {
-    const pool = filtered.filter(x => x._key !== correctItem._key);
+    // 3 choices: 1 correct + 2 random
+    const pool = filtered.filter(x => x !== correctItem);
     shuffle(pool);
-
     const wrong1 = pool[0] || correctItem;
     const wrong2 = pool[1] || correctItem;
 
     return shuffle([
-      { text: (correctItem.ar || correctItem.en), key: correctItem._key, correct: true },
-      { text: (wrong1.ar || wrong1.en), key: wrong1._key, correct: false },
-      { text: (wrong2.ar || wrong2.en), key: wrong2._key, correct: false },
+      { text: (correctItem.ar || correctItem.en), item: correctItem, correct: true },
+      { text: (wrong1.ar || wrong1.en), item: wrong1, correct: false },
+      { text: (wrong2.ar || wrong2.en), item: wrong2, correct: false },
     ]);
   }
 
@@ -170,23 +150,20 @@
     const item = currentItem();
 
     if (elTitle) elTitle.textContent = "اختبار العلامات المرورية";
-    if (elImg) {
-      elImg.src = signImgPath(item);
-      elImg.alt = item.ar || item.en || "Traffic sign";
-    }
-    if (elName) elName.textContent = ""; // hide title in quiz
-    if (elCat)  elCat.textContent  = item.category || "عام";
+    if (elName) elName.textContent = "";
+    if (elCat) elCat.textContent = item.category || "عام";
 
+    setImage(item);
     renderMeta();
 
     confirmed = false;
     selectedIndex = null;
 
-    if (quizBox) quizBox.style.display = "block";
+    if (!quizBox) return;
     if (elQText) elQText.textContent = "ما معنى هذه الإشارة؟";
 
     const choices = buildChoices(item);
-    quizBox.dataset.correctKey = String(item._key);
+    quizBox.dataset.correct = item.ar || item.en || "";
     quizBox.dataset.choices = JSON.stringify(choices);
 
     elChoices.innerHTML = "";
@@ -211,53 +188,52 @@
   }
 
   function confirmAnswer() {
-    if (confirmed || selectedIndex === null) return;
+    if (confirmed) return;
+    if (selectedIndex === null) return;
 
     confirmed = true;
 
-    const correctKey = Number(quizBox.dataset.correctKey);
     const choices = JSON.parse(quizBox.dataset.choices || "[]");
-
     const selected = choices[selectedIndex];
-    const isCorrect = selected && Number(selected.key) === correctKey;
+    const correctText = quizBox.dataset.correct;
+
+    const isCorrect = selected && selected.text === correctText;
 
     [...elChoices.children].forEach((btn, i) => {
       btn.disabled = true;
       btn.classList.remove("correct","wrong");
-      const c = choices[i];
-      if (c && Number(c.key) === correctKey) btn.classList.add("correct");
+      if (choices[i] && choices[i].text === correctText) btn.classList.add("correct");
       if (i === selectedIndex && !isCorrect) btn.classList.add("wrong");
     });
 
     if (isCorrect) score++;
-
     if (btnConfirm) btnConfirm.disabled = true;
   }
 
   function next() {
     if (MODE === "quiz" && !confirmed) return;
     idx++;
-    if (idx >= order.length) idx = 0;
+    if (idx >= filtered.length) idx = 0;
     render();
   }
 
   function prev() {
     idx--;
-    if (idx < 0) idx = order.length - 1;
+    if (idx < 0) idx = filtered.length - 1;
     render();
   }
 
   function randomizeOrder() {
-    const ids = order.slice();
-    shuffle(ids);
-    order = ids;
+    shuffle(filtered);
     idx = 0;
     render();
   }
 
   function render() {
-    if (MODE === "quiz") renderQuiz();
-    else {
+    if (MODE === "quiz") {
+      if (quizBox) quizBox.style.display = "block";
+      renderQuiz();
+    } else {
       if (quizBox) quizBox.style.display = "none";
       renderStudy();
     }
@@ -272,5 +248,6 @@
   if (catSel) catSel.addEventListener("change", applyFilters);
   if (searchInp) searchInp.addEventListener("input", applyFilters);
 
+  // ---- Start ----
   render();
 })();
