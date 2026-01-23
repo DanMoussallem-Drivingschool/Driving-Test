@@ -1,11 +1,13 @@
-
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>اختبار العلامات المرورية</title>
-  <link rel="stylesheet" href="signs_style.css?v=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="signs_style.css?v=2" />
 </head>
 <body>
 
@@ -15,40 +17,63 @@
   <div class="topbar">
     <select id="catFilter"></select>
     <input id="searchInp" type="text" placeholder="بحث..." />
+    <select id="countSel">
+      <option value="0">كل الأسئلة</option>
+      <option value="10">10 أسئلة</option>
+      <option value="20">20 سؤال</option>
+      <option value="30">30 سؤال</option>
+    </select>
   </div>
 
   <div id="errorBox" class="error"></div>
 
   <div class="card">
     <img id="signImg" class="img" alt="" />
+
     <div class="meta">
       <div id="signCat" class="cat"></div>
       <div id="signName" class="name"></div>
       <div id="metaBox" class="count"></div>
     </div>
 
+    <div class="row">
+      <button id="btnLang" class="btn">AR</button>
+      <button id="btnSpeak" class="btn">🔊 نطق</button>
+    </div>
+
     <div id="quizBox" class="quiz">
       <div id="questionText" class="q">ما معنى هذه الإشارة؟</div>
       <div id="choices" class="choices"></div>
-
       <button id="confirmBtn" class="btn primary">تأكيد الإجابة</button>
     </div>
 
-    <div class="actions">
+    <div id="hint" class="hint"></div>
+
+    <div class="actions row">
       <button id="btnPrev" class="btn">السابق</button>
       <button id="btnRand" class="btn">عشوائي</button>
       <button id="btnNext" class="btn primary">التالي</button>
+    </div>
+
+    <div id="resultsBox" class="results">
+      <h2>النتيجة</h2>
+      <div id="resultSummary" class="hint"></div>
+
+      <div class="row">
+        <button id="btnRestart" class="btn primary" style="display:none">إعادة الاختبار</button>
+        <button id="btnPdf" class="btn" style="display:none">حفظ PDF</button>
+      </div>
+
+      <div id="resultLines"></div>
     </div>
 
     <a class="back" href="../index.html">⬅ رجوع للرئيسية</a>
   </div>
 </div>
 
-<script src="signs_data.js?v=1"></script>
-<script>
-  window.SIGNS_MODE = "quiz";
-</script>
-<script src="signs_engine.js?v=1"></script>
+<script src="signs_data.js?v=2"></script>
+<script>window.SIGNS_MODE = "quiz";</script>
+<script src="signs_engine.js?v=2"></script>
 
 </body>
 </html>

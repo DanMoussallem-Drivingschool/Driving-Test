@@ -4,7 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>تعلم العلامات المرورية</title>
-  <link rel="stylesheet" href="signs_style.css?v=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="signs_style.css?v=2" />
 </head>
 <body>
 
@@ -20,13 +23,21 @@
 
   <div class="card">
     <img id="signImg" class="img" alt="" />
+
     <div class="meta">
       <div id="signCat" class="cat"></div>
       <div id="signName" class="name"></div>
       <div id="metaBox" class="count"></div>
     </div>
 
-    <div class="actions">
+    <div class="row">
+      <button id="btnLang" class="btn">AR</button>
+      <button id="btnSpeak" class="btn">🔊 نطق</button>
+    </div>
+
+    <div id="hint" class="hint"></div>
+
+    <div class="actions row">
       <button id="btnPrev" class="btn">السابق</button>
       <button id="btnRand" class="btn">عشوائي</button>
       <button id="btnNext" class="btn primary">التالي</button>
@@ -36,11 +47,9 @@
   </div>
 </div>
 
-<script src="signs_data.js?v=1"></script>
-<script>
-  window.SIGNS_MODE = "study";
-</script>
-<script src="signs_engine.js?v=1"></script>
+<script src="signs_data.js?v=2"></script>
+<script>window.SIGNS_MODE = "study";</script>
+<script src="signs_engine.js?v=2"></script>
 
 </body>
 </html>
