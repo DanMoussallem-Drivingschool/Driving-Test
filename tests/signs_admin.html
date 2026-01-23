@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>إدارة العلامات (توليد البيانات)</title>
+  <style>
+    body{font-family:Arial; background:#0b1220; color:#e8eefc; margin:0; padding:20px}
+    .row{display:flex; gap:14px; flex-wrap:wrap}
+    .card{background:#111a2c; border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px; width:360px}
+    img{width:100%; background:#fff; border-radius:12px; display:block}
+    input,select,button{width:100%; padding:10px; margin-top:8px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:#0f1830; color:#e8eefc}
+    button{cursor:pointer; background:#2d6bff; border:none}
+    button.secondary{background:#22304d}
+    .small{opacity:.8; font-size:13px}
+    .top{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px}
+    .top > *{flex:1}
+    textarea{width:100%; min-height:180px; border-radius:12px; padding:10px; background:#0f1830; color:#e8eefc; border:1px solid rgba(255,255,255,.15)}
+    a{color:#8fb6ff}
+  </style>
+</head>
+<body>
+
+<h2>إدارة العلامات (توليد signs_data.js)</h2>
+<div class="small">
+  هذه الصفحة لتصحيح الربط لأن صورك مرتبة عشوائياً.  
+  بعد تعبئة البيانات اضغط "تصدير" وانسخ الناتج إلى: <b>tests/signs_data.js</b>.
+</div>
+
+<div class="top">
+  <input id="basePath" value="../assets/signs_ar/" placeholder="مسار الصور (عادة: ../assets/signs_ar/)" />
+  <input id="filesList" placeholder='ألصق أسماء الملفات هنا مثل: sign_0001.webp, sign_0002.webp ...' />
+  <button id="loadBtn">تحميل القائمة</button>
+</div>
+
+<div class="row" id="cards"></div>
+
+<h3>تصدير</h3>
+<button id="exportBtn">تصدير dataset</button>
+<button class="secondary" id="copyBtn">نسخ للـ Clipboard</button>
+<div class="small">انسخ النص التالي والصقه داخل <b>tests/signs_data.js</b></div>
+<textarea id="out"></textarea>
+
+<p class="small">
+  رجوع: <a href="../index.html">الرئيسية</a>
+</p>
+
+<script>
+  const cardsEl = document.getElementById("cards");
+  const filesInp = document.getElementById("filesList");
+  const basePathInp = document.getElementById("basePath");
+  const loadBtn = document.getElementById("loadBtn");
+  const exportBtn = document.getElementById("exportBtn");
+  const copyBtn = document.getElementById("copyBtn");
+  const out = document.getElementById("out");
+
+  // Lebanese-style categories (editable)
+  const CATS = [
+    "إشارات تنظيمية",
+    "إشارات تحذيرية",
+    "إشارات إرشادية",
+    "إشارات أفضلية",
+    "إشارات خدمات",
+    "أخرى"
+  ];
+
+  let items = [];
+
+  function makeCard(file){
+    const wrap = document.createElement("div");
+    wrap.className = "card";
+    wrap.innerHTML = `
+      <img src="${basePathInp.value}${file}" alt="${file}">
+      <div class="small">الملف: <b>${file}</b></div>
+
+      <input class="ar" placeholder="الاسم بالعربية (مثال: قف)" />
+      <input class="en" placeholder="English (مثال: Stop)" />
+
+      <select class="cat">
+        ${CATS.map(c=>`<option value="${c}">${c}</option>`).join("")}
+      </select>
+    `;
+    return wrap;
+  }
+
+  function parseFiles(raw){
+    // accept comma or space or newline
+    return raw
+      .replaceAll("\\n", " ")
+      .replaceAll("\\r", " ")
+      .split(/[, ]+/)
+      .map(s=>s.trim())
+      .filter(Boolean);
+  }
+
+  loadBtn.addEventListener("click", () => {
+    const files = parseFiles(filesInp.value);
+    if(!files.length){
+      alert("ألصق أسماء الملفات (sign_0001.webp ...)");
+      return;
+    }
+    items = files.map(f => ({ file:f, ar:"", en:"", category:"إشارات تنظيمية" }));
+    cardsEl.innerHTML = "";
+    items.forEach((it, i) => {
+      const card = makeCard(it.file);
+
+      card.querySelector(".ar").addEventListener("input", e => items[i].ar = e.target.value.trim());
+      card.querySelector(".en").addEventListener("input", e => items[i].en = e.target.value.trim());
+      card.querySelector(".cat").addEventListener("change", e => items[i].category = e.target.value);
+
+      cardsEl.appendChild(card);
+    });
+  });
+
+  exportBtn.addEventListener("click", () => {
+    // basic validation: require ar OR en
+    const clean = items
+      .map(x => ({
+        file: x.file,
+        ar: x.ar || "",
+        en: x.en || "",
+        category: x.category || "أخرى"
+      }))
+      .filter(x => x.ar || x.en);
+
+    const js = `// tests/signs_data.js
+window.SIGNS_DATA = ${JSON.stringify(clean, null, 2)};`;
+
+    out.value = js;
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(out.value || "");
+      alert("✅ تم النسخ");
+    }catch(e){
+      alert("انسخ يدوياً من الصندوق.");
+    }
+  });
+</script>
+</body>
+</html>
