@@ -1,20 +1,51 @@
 // tests/signs_engine.js
-// محرك موحّد لصفحات تعلم/اختبار العلامات.
-// يعتمد على:
-// - tests/signs_data.js (window.SIGNS_DATA)
-// - صور: assets/signs_lb/sign_0001.webp ... (من نفس الترتيب داخل signs_data)
-
 (function () {
   "use strict";
 
-  const DATA = window.SIGNS_DATA || [];
-  const MODE = window.SIGNS_MODE || "study"; // "study" | "quiz"
-  const STORE_KEY = MODE === "quiz" ? "SIGNS_QUIZ_STATE_V1" : "SIGNS_STUDY_STATE_V1";
+  const DATA_RAW = window.SIGNS_DATA || window.SIGNS || [];
+  const MODE = window.SIGNS_MODE || "study"; // "study" or "quiz"
 
-  function signImgPath(id) {
-    const num = String(id).padStart(4, "0");
-    // الصفحات داخل /tests => نرجع مستوى واحد ثم assets
-    return `../assets/signs_lb/sign_${num}.webp`;
+  function qs(sel) { return document.querySelector(sel); }
+
+  // ✅ Use file mapping first (sign_0001.webp, ...)
+  function signImgPath(item) {
+    if (item && item.file) return `../assets/signs_ar/${item.file}`;
+    const n = Number(item && item.id ? item.id : 0);
+    const num = String(n).padStart(4, "0");
+    return `../assets/signs_ar/sign_${num}.webp`;
+  }
+
+  // infer id from file if needed
+  function idFromFile(file) {
+    const m = String(file || "").match(/sign_(\d+)\.webp/i);
+    return m ? Number(m[1]) : null;
+  }
+
+  // basic category inference (only if dataset doesn't provide category)
+  function inferCategory(item) {
+    if (item.category) return item.category;
+    const n = (item.file ? idFromFile(item.file) : null) ?? Number(item.id || 0);
+
+    // Simple Lebanese-style grouping by typical blocks
+    if (n >= 1 && n <= 29) return "إشارات تنظيمية";
+    if (n >= 30 && n <= 58) return "إشارات تحذيرية";
+    if (n >= 59 && n <= 73) return "إشارات إلزامية";
+    if (n >= 74 && n <= 87) return "إشارات إرشادية";
+    return "علامات/خطوط/إشارات أخرى";
+  }
+
+  function normalizeData(raw) {
+    return raw
+      .filter(Boolean)
+      .map((x, i) => {
+        const fid = x.file ? idFromFile(x.file) : null;
+        const key = (fid ?? x.id ?? (i + 1));
+        return {
+          ...x,
+          _key: key,
+          category: x.category || inferCategory({ ...x, id: key }),
+        };
+      });
   }
 
   function shuffle(arr) {
@@ -25,20 +56,24 @@
     return arr;
   }
 
-  function qs(sel) { return document.querySelector(sel); }
+  const DATA = normalizeData(DATA_RAW);
 
+  if (!Array.isArray(DATA) || DATA.length === 0) {
+    const box = qs("#errorBox");
+    if (box) box.textContent = "⚠️ لم يتم تحميل بيانات العلامات. تأكد من signs_data.js";
+    return;
+  }
+
+  // ---- Elements ----
   const elTitle = qs("#pageTitle");
   const elMeta  = qs("#metaBox");
   const elImg   = qs("#signImg");
   const elName  = qs("#signName");
   const elCat   = qs("#signCat");
-  const elHint  = qs("#hint");
 
   const btnPrev = qs("#btnPrev");
   const btnNext = qs("#btnNext");
   const btnRand = qs("#btnRand");
-  const btnSpeak = qs("#btnSpeak");
-  const btnLang  = qs("#btnLang");
 
   // Quiz-only
   const quizBox = qs("#quizBox");
@@ -46,87 +81,23 @@
   const elChoices = qs("#choices");
   const btnConfirm = qs("#confirmBtn");
 
-  // Results-only
-  const resultsBox = qs("#resultsBox");
-  const elResultSummary = qs("#resultSummary");
-  const elResultLines = qs("#resultLines");
-  const btnRestart = qs("#btnRestart");
-  const btnPdf = qs("#btnPdf");
-
   // Filters
   const catSel = qs("#catFilter");
   const searchInp = qs("#searchInp");
-  const countSel = qs("#countSel");
-
-  const errBox = qs("#errorBox");
-  if (!Array.isArray(DATA) || DATA.length === 0) {
-    if (errBox) errBox.textContent = "⚠️ لم يتم تحميل بيانات العلامات. تأكد من signs_data.js";
-    return;
-  }
-
-  // ---- Language (AR/EN) ----
-  let lang = "ar"; // default
-  function getLabel(item){
-    if (lang === "en" && item.en) return item.en;
-    return item.ar || item.en || "—";
-  }
-  function toggleLang(){
-    lang = (lang === "ar") ? "en" : "ar";
-    if (btnLang) btnLang.textContent = (lang === "ar") ? "AR" : "EN";
-    render();
-  }
-
-  // ---- Speech ----
-  function speak(text){
-    if (!("speechSynthesis" in window)) return;
-    const u = new SpeechSynthesisUtterance(text);
-    // العربية أفضل مع ar-SA غالباً (متوفر على أغلب الأجهزة)
-    u.lang = (lang === "ar") ? "ar-SA" : "en-US";
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-  }
 
   // ---- Categories ----
-  const categories = Array.from(new Set(DATA.map(x => x.category || "عام"))).sort((a,b)=>a.localeCompare(b,"ar"));
+  const categories = Array.from(new Set(DATA.map(x => x.category || "عام")))
+    .sort((a,b)=>a.localeCompare(b,"ar"));
+
   if (catSel) {
-    catSel.innerHTML = `<option value="__all__">كل الفئات</option>` +
+    catSel.innerHTML =
+      `<option value="__all__">كل الفئات</option>` +
       categories.map(c => `<option value="${c}">${c}</option>`).join("");
   }
 
-  // ---- State ----
   let filtered = DATA.slice();
-  let order = filtered.map(x => x.id);
+  let order = filtered.map(x => x._key);
   let idx = 0;
-
-  // quiz state
-  let selectedIndex = null;
-  let confirmed = false;
-  let score = 0;
-  let answersLog = []; // [{id, img, correctText, selectedText, ok}]
-
-  // ---- Load saved state (optional) ----
-  function loadState(){
-    try{
-      const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-      if (!s) return;
-      if (typeof s.lang === "string") lang = s.lang;
-      if (Array.isArray(s.order) && s.order.length) order = s.order;
-      if (typeof s.idx === "number") idx = Math.min(Math.max(0, s.idx), Math.max(0, order.length-1));
-      if (MODE === "quiz"){
-        if (typeof s.score === "number") score = s.score;
-        if (Array.isArray(s.answersLog)) answersLog = s.answersLog;
-      }
-    }catch(e){/* ignore */}
-  }
-
-  function saveState(){
-    const payload = { lang, order, idx };
-    if (MODE === "quiz") Object.assign(payload, { score, answersLog });
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify(payload)); }catch(e){/* ignore */}
-  }
-
-  loadState();
-  if (btnLang) btnLang.textContent = (lang === "ar") ? "AR" : "EN";
 
   function applyFilters() {
     const c = catSel ? catSel.value : "__all__";
@@ -136,100 +107,86 @@
       const catOk = (c === "__all__") || ((item.category || "عام") === c);
       if (!catOk) return false;
       if (!s) return true;
-      const hay = `${item.ar||""} ${item.en||""} ${item.category||""}`.toLowerCase();
+      const hay = `${item.ar || ""} ${item.en || ""} ${item.category || ""}`.toLowerCase();
       return hay.includes(s);
     });
 
-    order = filtered.map(x => x.id);
+    order = filtered.map(x => x._key);
 
+    const box = qs("#errorBox");
     if (order.length === 0) {
-      if (errBox) errBox.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
+      if (box) box.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
       return;
     }
-
+    if (box) box.textContent = "";
     idx = 0;
-    if (errBox) errBox.textContent = "";
-    saveState();
     render();
   }
 
   function currentItem() {
-    const id = order[idx];
-    return filtered.find(x => x.id === id) || filtered[idx] || DATA[0];
+    const key = order[idx];
+    return filtered.find(x => x._key === key) || filtered[idx] || DATA[0];
   }
 
   function renderMeta() {
-    if (!elMeta) return;
-    elMeta.textContent = `الإشارة ${idx + 1} من ${order.length}`;
-  }
-
-  function showImage(item){
-    if (!elImg) return;
-    elImg.src = signImgPath(item.id);
-    elImg.alt = getLabel(item);
-    elImg.onerror = () => {
-      if (errBox) errBox.textContent = "⚠️ صورة هذه الإشارة غير موجودة أو المسار غير صحيح.";
-    };
+    if (elMeta) elMeta.textContent = `الإشارة ${idx + 1} من ${order.length}`;
   }
 
   function renderStudy() {
     const item = currentItem();
-    if (elTitle) elTitle.textContent = "تعلم العلامات المرورية";
-    if (elName) elName.textContent = getLabel(item);
-    if (elCat) elCat.textContent = item.category || "عام";
-    showImage(item);
-    renderMeta();
 
-    if (elHint) {
-      elHint.textContent = "يمكنك تغيير اللغة أو الاستماع للنطق.";
-      elHint.style.display = "block";
+    if (elTitle) elTitle.textContent = "تعلم العلامات المرورية";
+    if (elName) elName.textContent = item.ar || item.en || "—";
+    if (elCat)  elCat.textContent  = item.category || "عام";
+
+    if (elImg) {
+      elImg.src = signImgPath(item);
+      elImg.alt = item.ar || item.en || "Traffic sign";
+      elImg.onerror = () => { elImg.alt = "❌ صورة غير موجودة"; };
     }
 
-    if (resultsBox) resultsBox.style.display = "none";
-    if (quizBox) quizBox.style.display = "none";
-    saveState();
+    renderMeta();
   }
 
   function buildChoices(correctItem) {
-    // 3 خيارات: واحدة صحيحة + 2 عشوائي
-    const pool = filtered.filter(x => x.id !== correctItem.id);
+    const pool = filtered.filter(x => x._key !== correctItem._key);
     shuffle(pool);
+
     const wrong1 = pool[0] || correctItem;
     const wrong2 = pool[1] || correctItem;
 
-    const choices = shuffle([
-      { text: getLabel(correctItem), id: correctItem.id, correct: true },
-      { text: getLabel(wrong1), id: wrong1.id, correct: false },
-      { text: getLabel(wrong2), id: wrong2.id, correct: false },
+    return shuffle([
+      { text: (correctItem.ar || correctItem.en), key: correctItem._key, correct: true },
+      { text: (wrong1.ar || wrong1.en), key: wrong1._key, correct: false },
+      { text: (wrong2.ar || wrong2.en), key: wrong2._key, correct: false },
     ]);
-
-    return choices;
   }
+
+  let selectedIndex = null;
+  let confirmed = false;
+  let score = 0;
 
   function renderQuiz() {
     const item = currentItem();
 
     if (elTitle) elTitle.textContent = "اختبار العلامات المرورية";
-    if (elCat) elCat.textContent = item.category || "عام";
-    if (elName) elName.textContent = ""; // بالاختبار نخفي الاسم
-    showImage(item);
+    if (elImg) {
+      elImg.src = signImgPath(item);
+      elImg.alt = item.ar || item.en || "Traffic sign";
+    }
+    if (elName) elName.textContent = ""; // hide title in quiz
+    if (elCat)  elCat.textContent  = item.category || "عام";
+
     renderMeta();
 
     confirmed = false;
     selectedIndex = null;
-    if (btnConfirm) btnConfirm.disabled = true;
 
-    if (resultsBox) resultsBox.style.display = "none";
     if (quizBox) quizBox.style.display = "block";
-
     if (elQText) elQText.textContent = "ما معنى هذه الإشارة؟";
-    if (elHint){
-      elHint.style.display = "block";
-      elHint.textContent = "اختر إجابة ثم اضغط (تأكيد الإجابة).";
-    }
 
     const choices = buildChoices(item);
-    quizBox.dataset.correctId = String(item.id);
+    quizBox.dataset.correctKey = String(item._key);
     quizBox.dataset.choices = JSON.stringify(choices);
 
     elChoices.innerHTML = "";
@@ -250,100 +207,37 @@
       elChoices.appendChild(btn);
     });
 
-    saveState();
+    if (btnConfirm) btnConfirm.disabled = true;
   }
 
   function confirmAnswer() {
-    if (confirmed) return;
-    if (selectedIndex === null) return;
+    if (confirmed || selectedIndex === null) return;
 
     confirmed = true;
 
-    const item = currentItem();
-    const correctId = Number(quizBox.dataset.correctId);
+    const correctKey = Number(quizBox.dataset.correctKey);
     const choices = JSON.parse(quizBox.dataset.choices || "[]");
 
-    const picked = choices[selectedIndex];
-    const ok = picked && picked.id === correctId;
+    const selected = choices[selectedIndex];
+    const isCorrect = selected && Number(selected.key) === correctKey;
 
-    // ألوان + تعطيل
     [...elChoices.children].forEach((btn, i) => {
       btn.disabled = true;
       btn.classList.remove("correct","wrong");
       const c = choices[i];
-      if (c && c.id === correctId) btn.classList.add("correct");
-      if (i === selectedIndex && !ok) btn.classList.add("wrong");
+      if (c && Number(c.key) === correctKey) btn.classList.add("correct");
+      if (i === selectedIndex && !isCorrect) btn.classList.add("wrong");
     });
 
-    if (ok) score++;
-
-    answersLog.push({
-      id: item.id,
-      img: signImgPath(item.id),
-      correctText: getLabel(item),
-      selectedText: picked ? picked.text : "",
-      ok: !!ok,
-      category: item.category || "عام"
-    });
-
-    if (elHint){
-      elHint.textContent = ok ? "✅ إجابة صحيحة" : "❌ إجابة خاطئة (الصحيح بالأخضر)";
-    }
+    if (isCorrect) score++;
 
     if (btnConfirm) btnConfirm.disabled = true;
-    saveState();
-  }
-
-  function finishQuiz() {
-    if (!resultsBox) return;
-
-    const total = order.length;
-    const percent = Math.round((score / total) * 100);
-    const passed = percent >= 70; // عتبة نجاح قابلة للتعديل
-
-    if (resultsBox) resultsBox.style.display = "block";
-    if (quizBox) quizBox.style.display = "none";
-
-    if (elResultSummary){
-      elResultSummary.textContent = `نتيجتك: ${score} / ${total} (${percent}%) — ${passed ? "✅ ناجح" : "❌ راسب"}`;
-    }
-
-    if (elResultLines){
-      elResultLines.innerHTML = "";
-      answersLog.forEach((a, i) => {
-        const row = document.createElement("div");
-        row.className = "res-line";
-        row.innerHTML = `
-          <img src="${a.img}" alt="">
-          <div class="res-txt">
-            <div class="t">سؤال ${i+1} — <span class="tag ${a.ok ? "ok":"no"}">${a.ok ? "صحيح":"خطأ"}</span></div>
-            <div class="s">
-              <div>إجابتك: <b>${a.selectedText || "—"}</b></div>
-              <div>الصحيح: <b>${a.correctText || "—"}</b></div>
-              <div>الفئة: ${a.category}</div>
-            </div>
-          </div>
-        `;
-        elResultLines.appendChild(row);
-      });
-    }
-
-    if (btnRestart) btnRestart.style.display = "inline-flex";
-    if (btnPdf) btnPdf.style.display = "inline-flex";
-
-    // progress full
-    if (elMeta) elMeta.textContent = `انتهى الاختبار`;
-    saveState();
   }
 
   function next() {
-    if (MODE === "quiz" && !confirmed) return; // لازم تأكيد
+    if (MODE === "quiz" && !confirmed) return;
     idx++;
-    if (idx >= order.length) {
-      if (MODE === "quiz") finishQuiz();
-      else idx = 0;
-      return;
-    }
+    if (idx >= order.length) idx = 0;
     render();
   }
 
@@ -354,125 +248,29 @@
   }
 
   function randomizeOrder() {
-    order = shuffle(order.slice());
-    idx = 0;
-
-    // بالاختبار: نعيد ضبط النتيجة والسجل
-    if (MODE === "quiz"){
-      score = 0;
-      answersLog = [];
-      confirmed = false;
-      selectedIndex = null;
-      if (btnConfirm) btnConfirm.disabled = true;
-    }
-
-    saveState();
-    render();
-  }
-
-  function restartQuiz(){
-    // يعيد الاختبار بنفس الفلتر والعدد
-    score = 0;
-    answersLog = [];
-    confirmed = false;
-    selectedIndex = null;
-    idx = 0;
-    // ترتيب جديد كل مرة
-    order = shuffle(order.slice());
-    saveState();
-    render();
-  }
-
-  function savePdf(){
-    const total = order.length;
-    const percent = Math.round((score / total) * 100);
-    const passed = percent >= 70;
-    const now = new Date().toLocaleString("ar-LB");
-
-    const w = window.open("", "_blank");
-    if (!w) { alert("الرجاء السماح بفتح نافذة جديدة (Pop-up) لحفظ PDF."); return; }
-
-    const rows = answersLog.map((a,i)=>`
-      <div style="border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0;">
-        <div><b>سؤال ${i+1}</b> — <span style="color:${a.ok ? "#16a34a":"#dc2626"};font-weight:700">${a.ok ? "صحيح":"خطأ"}</span></div>
-        <div style="margin-top:6px">إجابتك: <b>${a.selectedText||"—"}</b></div>
-        <div>الصحيح: <b>${a.correctText||"—"}</b></div>
-        <div style="color:#555">الفئة: ${a.category}</div>
-      </div>
-    `).join("");
-
-    const html = `
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <title>نتيجة اختبار العلامات</title>
-  <style>
-    body{font-family: Arial, sans-serif; direction:rtl; padding:24px}
-    h1{margin:0 0 10px}
-    .box{border:1px solid #ccc; padding:14px; border-radius:10px; margin-top:12px}
-    .small{color:#555}
-  </style>
-</head>
-<body>
-  <h1>نتيجة اختبار العلامات المرورية</h1>
-  <div class="box">
-    <p>النتيجة: ${score} / ${total} (${percent}%) — ${passed ? "✅ ناجح" : "❌ راسب"}</p>
-    <p class="small">التاريخ: ${now}</p>
-  </div>
-  ${rows}
-  <script>window.onload = () => window.print();</script>
-</body>
-</html>`;
-    w.document.open(); w.document.write(html); w.document.close();
-  }
-
-  function applyCount(){
-    // يحدد عدد أسئلة الاختبار (مثلاً 20) من الفلتر الحالي
-    if (!countSel) return;
-    const n = Number(countSel.value);
-    if (!n || n <= 0) return;
-
-    const ids = filtered.map(x=>x.id);
+    const ids = order.slice();
     shuffle(ids);
-    order = ids.slice(0, Math.min(n, ids.length));
+    order = ids;
     idx = 0;
-
-    if (MODE === "quiz"){
-      score = 0; answersLog = [];
-    }
-    saveState();
     render();
   }
 
   function render() {
     if (MODE === "quiz") renderQuiz();
-    else renderStudy();
+    else {
+      if (quizBox) quizBox.style.display = "none";
+      renderStudy();
+    }
   }
 
   // ---- Events ----
   if (btnPrev) btnPrev.addEventListener("click", prev);
   if (btnNext) btnNext.addEventListener("click", next);
   if (btnRand) btnRand.addEventListener("click", randomizeOrder);
-
   if (btnConfirm) btnConfirm.addEventListener("click", confirmAnswer);
-  if (btnRestart) btnRestart.addEventListener("click", restartQuiz);
-  if (btnPdf) btnPdf.addEventListener("click", savePdf);
-
-  if (btnSpeak) btnSpeak.addEventListener("click", () => {
-    const item = currentItem();
-    speak(getLabel(item));
-  });
-  if (btnLang) btnLang.addEventListener("click", toggleLang);
 
   if (catSel) catSel.addEventListener("change", applyFilters);
   if (searchInp) searchInp.addEventListener("input", applyFilters);
-  if (countSel) countSel.addEventListener("change", applyCount);
 
-  // ---- Start ----
-  // بالاختبار: نجعل الترتيب عشوائي مرة واحدة عند أول فتح إذا لم يكن محفوظ
-  if (MODE === "quiz" && (!localStorage.getItem(STORE_KEY))) {
-    order = shuffle(order.slice());
-  }
   render();
 })();
