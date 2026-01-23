@@ -344,7 +344,7 @@ window.SIGNS_DATA = [
     "ar": "أفسح",
     "en": "Give way (Yield)"
   },
-{
+  {
     "id": 58,
     "file": "sign_0058.webp",
     "ar": "التحذير على مراحل (150م / 100م / 50م)",
@@ -616,4 +616,3 @@ window.SIGNS_DATA = [
   }
 ];
 
-];
