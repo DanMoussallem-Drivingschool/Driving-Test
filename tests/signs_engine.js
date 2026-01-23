@@ -2,19 +2,20 @@
 (function () {
   "use strict";
 
-  // ---- Config ----
   const DATA = window.SIGNS_DATA || window.SIGNS || [];
   const MODE = window.SIGNS_MODE || "study"; // "study" or "quiz"
 
-  // ✅ correct folder (repo has: assets/signs/signs_ar/)
-  function signImgPath(item) {
-    // prefer explicit filename from data
-    if (item && item.file) {
-      return `../assets/signs/signs_ar/${item.file}`;
-    }
-    // fallback to id-based filename
-    const num = String(item.id || 1).padStart(4, "0");
-    return `../assets/signs/signs_ar/sign_${num}.webp`;
+  // ✅ Try multiple possible folders (because your repo structure changed between branches)
+  const BASE_PATHS = [
+    "../assets/signs/signs_ar/",  // assets/signs/signs_ar/
+    "../assets/signs_ar/",        // assets/signs_ar/
+  ];
+
+  function pad4(n) { return String(n).padStart(4, "0"); }
+
+  function getFile(item) {
+    if (item && item.file) return item.file;
+    return `sign_${pad4(item.id || 1)}.webp`;
   }
 
   function shuffle(arr) {
@@ -33,7 +34,6 @@
     return;
   }
 
-  // ---- Elements (shared) ----
   const elTitle = qs("#pageTitle");
   const elMeta  = qs("#metaBox");
   const elImg   = qs("#signImg");
@@ -44,17 +44,15 @@
   const btnNext = qs("#btnNext");
   const btnRand = qs("#btnRand");
 
-  // Quiz-only
   const quizBox = qs("#quizBox");
   const elQText = qs("#questionText");
   const elChoices = qs("#choices");
   const btnConfirm = qs("#confirmBtn");
 
-  // Filters
   const catSel = qs("#catFilter");
   const searchInp = qs("#searchInp");
+  const errorBox = qs("#errorBox");
 
-  // ---- Build categories ----
   const categories = Array.from(new Set(DATA.map(x => x.category || "عام")))
     .sort((a,b)=>a.localeCompare(b,"ar"));
 
@@ -74,62 +72,64 @@
     filtered = DATA.filter(item => {
       const catOk = (c === "__all__") || ((item.category || "عام") === c);
       if (!catOk) return false;
-
       if (!s) return true;
       const hay = `${item.ar || ""} ${item.en || ""} ${item.category || ""}`.toLowerCase();
       return hay.includes(s);
     });
 
     if (filtered.length === 0) {
-      const box = qs("#errorBox");
-      if (box) box.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
+      if (errorBox) errorBox.textContent = "⚠️ لا توجد نتائج لهذا الفلتر.";
       return;
     }
 
     idx = 0;
-    const box = qs("#errorBox");
-    if (box) box.textContent = "";
+    if (errorBox) errorBox.textContent = "";
     render();
   }
 
-  function currentItem() {
-    return filtered[idx] || DATA[0];
-  }
+  function currentItem() { return filtered[idx] || DATA[0]; }
 
   function renderMeta() {
     if (!elMeta) return;
     elMeta.textContent = `الإشارة ${idx + 1} من ${filtered.length}`;
   }
 
+  // ✅ Try paths until one works
   function setImage(item) {
     if (!elImg) return;
 
-    elImg.onerror = null;
-    elImg.src = signImgPath(item);
-    elImg.alt = item.ar || item.en || "Traffic sign";
+    const file = getFile(item);
+    let p = 0;
 
-    elImg.onerror = () => {
-      // show a clear message if not found
-      elImg.removeAttribute("src");
-      elImg.alt = "❌ صورة غير موجودة";
-      const box = qs("#errorBox");
-      if (box) box.textContent = `⚠️ صورة غير موجودة: ${item.file || ("sign_" + String(item.id).padStart(4,"0") + ".webp")}`;
-    };
+    function tryNext() {
+      if (p >= BASE_PATHS.length) {
+        elImg.removeAttribute("src");
+        elImg.alt = "❌ صورة غير موجودة";
+        if (errorBox) errorBox.textContent = `⚠️ صورة غير موجودة: ${file}`;
+        return;
+      }
+      const src = BASE_PATHS[p] + file;
+      p++;
+
+      elImg.onerror = () => tryNext();
+      elImg.src = src;
+      elImg.alt = item.ar || item.en || "Traffic sign";
+    }
+
+    tryNext();
   }
 
   function renderStudy() {
     const item = currentItem();
-
     if (elTitle) elTitle.textContent = "تعلم العلامات المرورية";
     if (elName) elName.textContent = item.ar || item.en || "—";
     if (elCat) elCat.textContent = item.category || "عام";
-
+    if (errorBox) errorBox.textContent = "";
     setImage(item);
     renderMeta();
   }
 
   function buildChoices(correctItem) {
-    // 3 choices: 1 correct + 2 random
     const pool = filtered.filter(x => x !== correctItem);
     shuffle(pool);
     const wrong1 = pool[0] || correctItem;
@@ -144,15 +144,13 @@
 
   let selectedIndex = null;
   let confirmed = false;
-  let score = 0;
 
   function renderQuiz() {
     const item = currentItem();
-
     if (elTitle) elTitle.textContent = "اختبار العلامات المرورية";
     if (elName) elName.textContent = "";
     if (elCat) elCat.textContent = item.category || "عام";
-
+    if (errorBox) errorBox.textContent = "";
     setImage(item);
     renderMeta();
 
@@ -188,9 +186,7 @@
   }
 
   function confirmAnswer() {
-    if (confirmed) return;
-    if (selectedIndex === null) return;
-
+    if (confirmed || selectedIndex === null) return;
     confirmed = true;
 
     const choices = JSON.parse(quizBox.dataset.choices || "[]");
@@ -206,20 +202,17 @@
       if (i === selectedIndex && !isCorrect) btn.classList.add("wrong");
     });
 
-    if (isCorrect) score++;
     if (btnConfirm) btnConfirm.disabled = true;
   }
 
   function next() {
     if (MODE === "quiz" && !confirmed) return;
-    idx++;
-    if (idx >= filtered.length) idx = 0;
+    idx = (idx + 1) % filtered.length;
     render();
   }
 
   function prev() {
-    idx--;
-    if (idx < 0) idx = filtered.length - 1;
+    idx = (idx - 1 + filtered.length) % filtered.length;
     render();
   }
 
@@ -239,7 +232,6 @@
     }
   }
 
-  // ---- Events ----
   if (btnPrev) btnPrev.addEventListener("click", prev);
   if (btnNext) btnNext.addEventListener("click", next);
   if (btnRand) btnRand.addEventListener("click", randomizeOrder);
@@ -248,6 +240,5 @@
   if (catSel) catSel.addEventListener("change", applyFilters);
   if (searchInp) searchInp.addEventListener("input", applyFilters);
 
-  // ---- Start ----
   render();
 })();
